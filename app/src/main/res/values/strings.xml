@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">HomeWork4</string>
+    <string name="page">Page №%d</string>
+    <string name="favourites">Избранное</string>
+</resources>
