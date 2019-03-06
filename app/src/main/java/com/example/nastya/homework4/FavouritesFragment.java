@@ -2,60 +2,66 @@ package com.example.nastya.homework4;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class FavouritesFragment extends Fragment {
-    private static final String ARGUMENT_DOCUMENT_NUMBER = "document_number";
-    private News news;
-    String TAG = "myLogs";
+    private List<News> newsList = new ArrayList<>();
+    private static FavouritesFragment favouritesFragment;
+    private View rootView;
+    MyAdapter adapter;
 
-//    static FavouritesFragment newInstance(News news) {
-//        FavouritesFragment favouritesFragment = new FavouritesFragment();
-//        Bundle arguments = new Bundle();
-//        arguments.putParcelable(ARGUMENT_DOCUMENT_NUMBER, news);
-//        Log.d("myLogs", "newInstance " + news.getDescriptionNews());
-//        favouritesFragment.setArguments(arguments);
-//        return favouritesFragment;
-//    }
+
+    public static FavouritesFragment newInstance(){
+        favouritesFragment = new FavouritesFragment();
+        return favouritesFragment;
+    }
+
+    public static FavouritesFragment getInstance(){
+        return favouritesFragment;
+    }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        news = getArguments().getParcelable(ARGUMENT_DOCUMENT_NUMBER);
-//        Log.d("myLogs", "onCreate " + news.getDescriptionNews());
+//        adapter = (new MyAdapter(newsList, (position, news) -> {
+//            Intent intent = new Intent(getContext(), ContentNews.class);
+//            intent.putExtra(News.class.getSimpleName(), news);
+//            startActivity(intent);
+//        }));
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-//        Log.d("myLogs", "onCreateView " + news.getDescriptionNews());
-        return inflater.inflate(R.layout.favourites_fragment, container, false);
+        rootView = inflater.inflate(R.layout.fragment, container, false);
+        return rootView;
     }
-//
-//    @Override
-//    public void onViewCreated(View view, Bundle savedInstanceState) {
-//        super.onViewCreated(view, savedInstanceState);
-////        TextView textView = new TextView(getActivity());
-////        textView.setText(news.getDescriptionNews());
-//        Log.d("myLogs", "onViewCreated " + news.getDescriptionNews());
-//        TextView test = view.findViewById(R.id.test);
-//        test.setText(news.getDescriptionNews());
-//
-//     //   LinearLayout linearLayout = view.findViewById(R.id.layoutFavourites);
-//        //Log.d(TAG, "lin " + linearLayout);
-//     //   linearLayout.addView(textView);
-//
-//    }
+
+    public void addNews(News favouriteNews){
+        newsList.add(new News(favouriteNews.getTitleNews(), favouriteNews.getDateNews(), favouriteNews.getDescriptionNews()));
+
+        RecyclerView recyclerView = rootView.findViewById(R.id.recyclerView);
+//        recyclerView.setAdapter(adapter);
+//        adapter.notifyItemInserted(newsList.size()-1);
+        recyclerView.setAdapter(new MyAdapter(newsList, (position, news) -> {
+            Intent intent = new Intent(getContext(), ContentNews.class);
+            intent.putExtra(News.class.getSimpleName(), news);
+            startActivity(intent);
+        }));
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(getContext(), linearLayoutManager.getOrientation());
+        recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerView.addItemDecoration(dividerItemDecoration);
+    }
 }

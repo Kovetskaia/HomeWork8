@@ -1,7 +1,6 @@
 package com.example.nastya.homework4;
 
 import android.os.Bundle;
-import android.util.Log;
 
 import com.google.android.material.tabs.TabLayout;
 
@@ -14,39 +13,20 @@ import androidx.viewpager.widget.ViewPager;
 
 public class MainActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener {
     static final int COUNT_PAGES = 2;
-
-    PagerAdapter mAdapter;
-    ViewPager mPager;
+    PagerAdapter pagerAdapter;
+    ViewPager viewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mAdapter = new MyFragmentPagerAdapter(getSupportFragmentManager());
+        pagerAdapter = new MyFragmentPagerAdapter(getSupportFragmentManager());
 
-        mPager = findViewById(R.id.pager);
-        mPager.setAdapter(mAdapter);
+        viewPager = findViewById(R.id.pager);
+        viewPager.setAdapter(pagerAdapter);
 
         TabLayout tabLayout = findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(mPager);
-
-//        mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-//            @Override
-//            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-//
-//            }
-//
-//            @Override
-//            public void onPageSelected(int position) {
-//
-//            }
-//
-//            @Override
-//            public void onPageScrollStateChanged(int state) {
-//
-//            }
-//        });
-//        mPager.clearOnPageChangeListeners();
+        tabLayout.setupWithViewPager(viewPager);
     }
 
     @Override
@@ -78,14 +58,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
 
         @Override
         public Fragment getItem(int position) {
-            if(position == 0) {
-                Log.d("myLogs", "getItem");
-                return new CurrentNewsFragment();
-            }
-            else{
-                Log.d("myLogs", "getItem else");
-            return new FavouritesFragment();}
-
+            return position == 0 ? new CurrentNewsFragment() : FavouritesFragment.newInstance();
         }
 
         @Override

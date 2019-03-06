@@ -1,13 +1,12 @@
 package com.example.nastya.homework4;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import java.util.List;
 
-import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 interface Listener {
@@ -15,18 +14,18 @@ interface Listener {
 }
 
 public class MyAdapter extends RecyclerView.Adapter<MyViewHolder>{
-    LayoutInflater inflater;
+    private LayoutInflater inflater;
 
-    private List<News> events;
+    private List<News> newsList;
     private Listener listener;
 
     MyAdapter(List<News> news, Listener listener){
-        this.events = news;
+        this.newsList = news;
         this.listener = listener;
     }
-    @NonNull
+
     @Override
-    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         inflater =
                 LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.item_news, parent, false);
@@ -35,7 +34,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder>{
         view.setOnClickListener(v -> {
             int pos = holder.getAdapterPosition();
             if (pos != RecyclerView.NO_POSITION) {
-                listener.onUserClick(pos, events.get(pos));
+                listener.onUserClick(pos, newsList.get(pos));
             }
         });
 
@@ -44,16 +43,17 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder>{
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-            News news = events.get(position);
+    public void onBindViewHolder(MyViewHolder holder, int position) {
+            News news = newsList.get(position);
             holder.titleNews.setText(news.getTitleNews());
             holder.dateNews.setText(news.getDateNews());
             holder.descriptionNews.setText(news.getDescriptionNews());
+        Log.d("myLogs", "bind, position = " + position);
     }
 
     @Override
     public int getItemCount() {
-        return events.size();
+        return newsList.size();
     }
 
 }

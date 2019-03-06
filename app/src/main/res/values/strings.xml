@@ -2,4 +2,53 @@
     <string name="app_name">HomeWork4</string>
     <string name="page">Page №%d</string>
     <string name="favourites">Избранное</string>
+    <string name="Title1">Mauris blandit mattis velit in.</string>
+    <string name="Title2">Donec eget ultricies sem. Mauris.</string>
+    <string name="Title3">Mauris id purus ac eros.</string>
+    <string name="Title4">Vestibulum at scelerisque elit. Aenean.</string>
+    <string name="Title5">Phasellus venenatis volutpat urna at.</string>
+    <string name="Date1">01.02.2019</string>
+    <string name="Date2">02.02.2019</string>
+    <string name="Date3">03.02.2019</string>
+    <string name="Date4">04.02.2019</string>
+    <string name="Date5">05.02.2019</string>
+    <string name="Description1">Fusce commodo, mi in euismod molestie, eros massa maximus lectus,
+        a facilisis tellus arcu in sapien. Pellentesque hendrerit ligula nunc, ac eleifend tortor efficitur et.
+        Nulla eget tempor eros. Quisque convallis urna volutpat neque laoreet facilisis.
+        Sed convallis, massa et eleifend lobortis, arcu quam pretium augue, non hendrerit est felis sed tellus.
+        Cras vel diam interdum, cursus neque sit amet, lacinia mi. Integer in mattis sapien.
+        Etiam massa enim, dignissim sed tellus at, accumsan iaculis leo. </string>
+    <string name="Description2">Proin id sapien nec ex rutrum gravida mollis id diam.
+        Donec bibendum quam vel dolor interdum, eget porta tellus eleifend.
+        Proin fringilla nibh sit amet justo venenatis sodales.
+        Morbi ullamcorper, ligula sed dictum dapibus, nulla neque ultrices lacus, ultricies viverra eros ex ac risus.
+        Aenean fermentum est a suscipit ornare. Proin posuere lorem sit amet dolor elementum, eu dapibus justo tempor.
+        Pellentesque consectetur ultricies ipsum quis tincidunt.
+        Aenean sollicitudin, velit in malesuada pharetra, massa est semper urna, et placerat urna justo non lectus.
+        Sed malesuada velit sit amet eros ornare, sit amet hendrerit massa placerat. </string>
+    <string name="Description3">Maecenas hendrerit vitae quam vitae vulputate.
+        Cras sem est, porta vitae tempor vel, vestibulum vitae odio.
+        In sodales ante magna, in suscipit sem ullamcorper eu.
+        Etiam condimentum arcu nec sem molestie, ultrices finibus eros hendrerit.
+        Praesent non orci ornare, efficitur leo vel, congue nunc.
+        Aenean vitae nisl sed mauris pharetra semper vitae at tortor.
+        Ut congue nisl ut porttitor semper. </string>
+    <string name="Description4">Aliquam dignissim et metus ut vehicula.
+        Etiam convallis leo elit, sit amet suscipit purus efficitur vel.
+        Vestibulum eget hendrerit odio. Pellentesque nibh massa, bibendum vitae porta vel, pretium ut libero.
+        Vestibulum eget placerat massa, id accumsan nisi.
+        Nulla convallis elit in dui suscipit suscipit.
+        Etiam ultrices rhoncus urna pellentesque eleifend.
+        Sed faucibus faucibus magna.
+        Nulla sagittis, massa finibus laoreet aliquet, purus turpis mollis nunc, nec venenatis odio arcu quis mi.
+        Fusce magna odio, rutrum quis volutpat vel, malesuada at felis.
+        Sed vel ante sed augue gravida ultricies sit amet vitae magna.
+        Ut ac sapien mattis, posuere enim congue, ultricies odio. </string>
+    <string name="Description5">Duis tempus, dui sed molestie dictum, nibh velit lobortis nisl, ut ornare leo purus eu metus.
+        Donec eu magna ut orci cursus rhoncus nec quis arcu. Vestibulum mollis quam ac turpis malesuada blandit.
+        Integer efficitur neque non dui ullamcorper viverra. Nam mollis ultricies est eu pulvinar.
+        Nullam vitae efficitur felis. Aliquam nec nisi eu tortor tempor dignissim nec a lacus.
+        Nam sagittis neque sed arcu tincidunt, vitae ullamcorper dui accumsan.
+        Quisque elementum, libero at dictum interdum, ligula orci tempus arcu, eu venenatis erat metus nec neque.
+        Mauris auctor vehicula eleifend. In at iaculis felis, nec tempor tortor. </string>
 </resources>

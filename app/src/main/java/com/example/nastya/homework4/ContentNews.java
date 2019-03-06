@@ -1,17 +1,12 @@
 package com.example.nastya.homework4;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.material.tabs.TabLayout;
-
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 
 public class ContentNews extends AppCompatActivity {
     TextView contentDate, contentDescription;
@@ -44,8 +39,8 @@ public class ContentNews extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
         if(menuItem.getItemId() == R.id.favourites) {
-
-            Toast.makeText(this,"Новость добавлена в избранное" + news.getDescriptionNews(), Toast.LENGTH_LONG).show();
+            FavouritesFragment.getInstance().addNews(news);
+            Toast.makeText(this,"Новость добавлена в избранное", Toast.LENGTH_LONG).show();
             return true;
         }
           return super.onOptionsItemSelected(menuItem);

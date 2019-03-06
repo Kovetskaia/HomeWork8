@@ -3,19 +3,10 @@ package com.example.nastya.homework4;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class News implements Parcelable{
-    private String titleNews;
-    private String dateNews;
-    private String descriptionNews;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
-
-    News(String titleNews, String dateNews, String descriptionNews){
-        this.titleNews = titleNews;
-        this.dateNews = dateNews;
-        this.descriptionNews = descriptionNews;
-    }
-
-
+public class News implements Parcelable {
     public static final Creator<News> CREATOR = new Creator<News>() {
         @Override
         public News createFromParcel(Parcel in) {
@@ -30,6 +21,15 @@ public class News implements Parcelable{
             return new News[size];
         }
     };
+    private String titleNews;
+    private String dateNews;
+    private String descriptionNews;
+
+    News(String titleNews, String dateNews, String descriptionNews) {
+        this.titleNews = titleNews;
+        this.dateNews = dateNews;
+        this.descriptionNews = descriptionNews;
+    }
 
     public String getTitleNews() {
         return titleNews;
