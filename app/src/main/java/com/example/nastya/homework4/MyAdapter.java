@@ -27,31 +27,31 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        inflater =
-                LayoutInflater.from(parent.getContext());
+        View view;
+        inflater = LayoutInflater.from(parent.getContext());
         switch (viewType) {
             case ListItem.TYPE_DATE: {
-                View itemView = inflater.inflate(R.layout.item_date_group, parent, false);
-                return new DataGroupViewHolder(itemView);
+                view = inflater.inflate(R.layout.item_date_group, parent, false);
+                return new DataGroupViewHolder(view);
             }
             case ListItem.TYPE_NEWS: {
-                View itemView = inflater.inflate(R.layout.item_news, parent, false);
-                return new NewsViewHolder(itemView);
+                view = inflater.inflate(R.layout.item_news, parent, false);
+                NewsViewHolder holder = new NewsViewHolder(view);
+                view.setOnClickListener(v -> {
+                    int pos = holder.getAdapterPosition();
+                    if (pos != RecyclerView.NO_POSITION) {
+                        listener.onUserClick(pos, (News) newsList.get(pos));
+                    }
+                });
+
+                return holder;
             }
             default:
                 throw new IllegalStateException("unsupported item type");
         }
-//        View view = inflater.inflate(R.layout.item_news, parent, false);
-//
-//        final MyViewHolder holder = new MyViewHolder(view);
-//        view.setOnClickListener(v -> {
-//            int pos = holder.getAdapterPosition();
-//            if (pos != RecyclerView.NO_POSITION) {
-//                listener.onUserClick(pos, newsList.get(pos));
-//            }
-//        });
-//
-//        return holder;
+
+
+
 
     }
 
