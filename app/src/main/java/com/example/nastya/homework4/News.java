@@ -6,7 +6,7 @@ import android.os.Parcelable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class News implements Parcelable {
+public class News extends ListItem implements Parcelable {
     public static final Creator<News> CREATOR = new Creator<News>() {
         @Override
         public News createFromParcel(Parcel in) {
@@ -25,7 +25,7 @@ public class News implements Parcelable {
     private String dateNews;
     private String descriptionNews;
 
-    News(String titleNews, String dateNews, String descriptionNews) {
+    public News(String titleNews, String dateNews, String descriptionNews) {
         this.titleNews = titleNews;
         this.dateNews = dateNews;
         this.descriptionNews = descriptionNews;
@@ -67,4 +67,8 @@ public class News implements Parcelable {
         dest.writeString(descriptionNews);
     }
 
+    @Override
+    public int getType() {
+        return TYPE_NEWS;
+    }
 }
