@@ -2,16 +2,23 @@
     <string name="app_name">HomeWork4</string>
     <string name="page">Page №%d</string>
     <string name="favourites">Избранное</string>
+    <string name="latest">Последние</string>
+    <string name="today">Сегодня</string>
+    <string name="yesterday">Вчера</string>
     <string name="Title1">Mauris blandit mattis velit in.</string>
     <string name="Title2">Donec eget ultricies sem. Mauris.</string>
     <string name="Title3">Mauris id purus ac eros.</string>
     <string name="Title4">Vestibulum at scelerisque elit. Aenean.</string>
     <string name="Title5">Phasellus venenatis volutpat urna at.</string>
+    <string name="Title6">Pellentesque vitae finibus orci, et.</string>
+    <string name="Title7">Vestibulum consequat quis massa in.</string>
     <string name="Date1">01.02.2019</string>
     <string name="Date2">02.02.2019</string>
-    <string name="Date3">03.02.2019</string>
-    <string name="Date4">04.02.2019</string>
-    <string name="Date5">05.02.2019</string>
+    <string name="Date3">02.02.2019</string>
+    <string name="Date4">08.03.2019</string>
+    <string name="Date5">15.02.2019</string>
+    <string name="Date6">15.02.2019</string>
+    <string name="Date7">01.02.2019</string>
     <string name="Description1">Fusce commodo, mi in euismod molestie, eros massa maximus lectus,
         a facilisis tellus arcu in sapien. Pellentesque hendrerit ligula nunc, ac eleifend tortor efficitur et.
         Nulla eget tempor eros. Quisque convallis urna volutpat neque laoreet facilisis.
@@ -51,4 +58,14 @@
         Nam sagittis neque sed arcu tincidunt, vitae ullamcorper dui accumsan.
         Quisque elementum, libero at dictum interdum, ligula orci tempus arcu, eu venenatis erat metus nec neque.
         Mauris auctor vehicula eleifend. In at iaculis felis, nec tempor tortor. </string>
+    <string name="Description6">Fusce sit amet suscipit massa, vel tincidunt tellus.
+        Duis vel metus mollis, rutrum nulla non, pulvinar urna. Sed faucibus ultricies tincidunt.
+        Donec congue elit sit amet justo facilisis dictum. Integer vitae tellus nulla.
+        Proin hendrerit massa sit amet magna vestibulum, et semper ligula elementum.
+        Nullam eu ultrices augue. Vestibulum orci velit, posuere eget eros eu, eleifend sodales nulla.</string>
+    <string name="Description7">Aenean non odio auctor, tempor nisl ac, laoreet diam.
+        Vestibulum venenatis interdum mauris, et viverra lacus lacinia eget.
+        Praesent vel rutrum metus. Sed in posuere ante. Nullam bibendum finibus consectetur.
+        Vivamus vel felis a justo pulvinar gravida gravida in augue. Etiam venenatis arcu non neque elementum dictum.
+        Nulla facilisi.</string>
 </resources>

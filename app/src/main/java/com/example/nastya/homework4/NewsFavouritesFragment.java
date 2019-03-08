@@ -9,37 +9,24 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class FavouritesFragment extends Fragment {
+public class NewsFavouritesFragment extends Fragment {
+    private static NewsFavouritesFragment newsFavouritesFragment;
     private List<ListItem> newsList = new ArrayList<>();
-    private static FavouritesFragment favouritesFragment;
     private View rootView;
-    MyAdapter adapter;
 
-
-    public static FavouritesFragment newInstance(){
-        favouritesFragment = new FavouritesFragment();
-        return favouritesFragment;
+    public static NewsFavouritesFragment newInstance() {
+        newsFavouritesFragment = new NewsFavouritesFragment();
+        return newsFavouritesFragment;
     }
 
-    public static FavouritesFragment getInstance(){
-        return favouritesFragment;
+    public static NewsFavouritesFragment getInstance() {
+        return newsFavouritesFragment;
     }
-
-//    @Override
-//    public void onCreate(@Nullable Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-////        adapter = (new MyAdapter(newsList, (position, news) -> {
-////            Intent intent = new Intent(getContext(), ContentNews.class);
-////            intent.putExtra(News.class.getSimpleName(), news);
-////            startActivity(intent);
-////        }));
-//    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -47,15 +34,13 @@ public class FavouritesFragment extends Fragment {
         return rootView;
     }
 
-    public void addNews(News favouriteNews){
-        newsList.add(new News(favouriteNews.getTitleNews(), favouriteNews.getDateNews(), favouriteNews.getDescriptionNews()));
+    public void addNews(ItemNews favouriteItemNews) {
+        newsList.add(new ItemNews(favouriteItemNews.getTitleNews(), favouriteItemNews.getDateNews(), favouriteItemNews.getDescriptionNews()));
 
         RecyclerView recyclerView = rootView.findViewById(R.id.recyclerView);
-//        recyclerView.setAdapter(adapter);
-//        adapter.notifyItemInserted(newsList.size()-1);
         recyclerView.setAdapter(new MyAdapter(newsList, (position, news) -> {
-            Intent intent = new Intent(getContext(), ContentNews.class);
-            intent.putExtra(News.class.getSimpleName(), news);
+            Intent intent = new Intent(getContext(), NewsContent.class);
+            intent.putExtra(ItemNews.class.getSimpleName(), news);
             startActivity(intent);
         }));
 

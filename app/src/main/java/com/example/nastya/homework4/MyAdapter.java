@@ -1,6 +1,5 @@
 package com.example.nastya.homework4;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,16 +10,16 @@ import java.util.List;
 import androidx.recyclerview.widget.RecyclerView;
 
 interface Listener {
-    void onUserClick(int position, News n);
+    void onUserClick(int position, ItemNews n);
 }
 
-public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
+public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private LayoutInflater inflater;
 
     private List<ListItem> newsList;
     private Listener listener;
 
-    MyAdapter(List<ListItem> news, Listener listener){
+    MyAdapter(List<ListItem> news, Listener listener) {
         this.newsList = news;
         this.listener = listener;
     }
@@ -40,19 +39,15 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
                 view.setOnClickListener(v -> {
                     int pos = holder.getAdapterPosition();
                     if (pos != RecyclerView.NO_POSITION) {
-                        listener.onUserClick(pos, (News) newsList.get(pos));
+                        listener.onUserClick(pos, (ItemNews) newsList.get(pos));
                     }
                 });
 
                 return holder;
             }
             default:
-                throw new IllegalStateException("unsupported item type");
+                throw new IllegalArgumentException("unknown viewType=" + viewType);
         }
-
-
-
-
     }
 
     @Override
@@ -60,32 +55,27 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         int viewType = getItemViewType(position);
         switch (viewType) {
             case ListItem.TYPE_DATE: {
-                DateGroup dateGroup = (DateGroup) newsList.get(position);
-                ((DataGroupViewHolder) holder).txt_title.setText(dateGroup.getDate());
+                ItemDateGroup itemDateGroup = (ItemDateGroup) newsList.get(position);
+                ((DataGroupViewHolder) holder).textTitle.setText(itemDateGroup.getDate());
                 break;
             }
             case ListItem.TYPE_NEWS: {
-                News news = (News) newsList.get(position);
-                ((NewsViewHolder) holder).titleNews.setText(news.getTitleNews());
-                ((NewsViewHolder) holder).dateNews.setText(news.getDateNews());
-                ((NewsViewHolder) holder).descriptionNews.setText(news.getDescriptionNews());
+                ItemNews itemNews = (ItemNews) newsList.get(position);
+                ((NewsViewHolder) holder).titleNews.setText(itemNews.getTitleNews());
+                ((NewsViewHolder) holder).dateNews.setText(itemNews.getDateNews());
+                ((NewsViewHolder) holder).descriptionNews.setText(itemNews.getDescriptionNews());
                 break;
             }
             default:
-                throw new IllegalStateException("unsupported item type");
+                throw new IllegalArgumentException("unknown viewType=" + viewType);
         }
-
-//            News news = newsList.get(position);
-//            holder.titleNews.setText(news.getTitleNews());
-//            holder.dateNews.setText(news.getDateNews());
-//            holder.descriptionNews.setText(news.getDescriptionNews());
-//        Log.d("myLogs", "bind, position = " + position);
     }
 
     @Override
     public int getItemCount() {
         return newsList.size();
     }
+
     @Override
     public int getItemViewType(int position) {
         return newsList.get(position).getType();
@@ -104,15 +94,13 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         }
     }
 
-    private static class DataGroupViewHolder extends RecyclerView.ViewHolder {
-
-        TextView txt_title;
+    private class DataGroupViewHolder extends RecyclerView.ViewHolder {
+        TextView textTitle;
 
         DataGroupViewHolder(View itemView) {
             super(itemView);
-            txt_title = (TextView) itemView.findViewById(R.id.dateGroup);
+            textTitle = itemView.findViewById(R.id.itemDateGroup);
         }
-
     }
 
 }

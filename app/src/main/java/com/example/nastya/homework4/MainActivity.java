@@ -44,7 +44,6 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
 
     }
 
-
     private class MyFragmentPagerAdapter extends FragmentPagerAdapter {
 
         MyFragmentPagerAdapter(FragmentManager fragmentManager) {
@@ -53,12 +52,12 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
 
         @Override
         public CharSequence getPageTitle(int position) {
-            return position == 0 ? "Последние " : "Избранное";
+            return position == 0 ? getString(R.string.latest) : getString(R.string.favourites);
         }
 
         @Override
         public Fragment getItem(int position) {
-            return position == 0 ? new CurrentNewsFragment() : FavouritesFragment.newInstance();
+            return position == 0 ? new NewsListFragment() : NewsFavouritesFragment.newInstance();
         }
 
         @Override

@@ -8,24 +8,24 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-public class ContentNews extends AppCompatActivity {
+public class NewsContent extends AppCompatActivity {
     TextView contentDate, contentDescription;
-    News news;
+    ItemNews itemNews;
     MenuItem favourites;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.content_news);
+        setContentView(R.layout.news_content);
 
         contentDate = findViewById(R.id.contentDate);
         contentDescription = findViewById(R.id.contentDescription);
 
-        news = getIntent().getParcelableExtra(News.class.getSimpleName());
+        itemNews = getIntent().getParcelableExtra(ItemNews.class.getSimpleName());
 
-        setTitle(news.getTitleNews());
-        contentDate.setText(news.getDateNews());
-        contentDescription.setText(news.getDescriptionNews());
+        setTitle(itemNews.getTitleNews());
+        contentDate.setText(itemNews.getDateNews());
+        contentDescription.setText(itemNews.getDescriptionNews());
 
     }
 
@@ -38,12 +38,12 @@ public class ContentNews extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
-        if(menuItem.getItemId() == R.id.favourites) {
-            FavouritesFragment.getInstance().addNews(news);
-            Toast.makeText(this,"Новость добавлена в избранное", Toast.LENGTH_LONG).show();
+        if (menuItem.getItemId() == R.id.favourites) {
+            NewsFavouritesFragment.getInstance().addNews(itemNews);
+            Toast.makeText(this, "Новость добавлена в избранное", Toast.LENGTH_LONG).show();
             return true;
         }
-          return super.onOptionsItemSelected(menuItem);
+        return super.onOptionsItemSelected(menuItem);
     }
 
 }
