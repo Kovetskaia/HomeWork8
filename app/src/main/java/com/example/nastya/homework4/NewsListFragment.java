@@ -22,7 +22,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class NewsListFragment extends Fragment {
-    private List<ItemNews> itemNewsList = new ArrayList<>();
     private List<ListItem> itemsList = new ArrayList<>();
     private View rootView;
     private Calendar calendar;
@@ -46,13 +45,16 @@ public class NewsListFragment extends Fragment {
         curMonth = calendar.get(Calendar.MONTH) + 1;
         curYear = calendar.get(Calendar.YEAR);
         yesDay = curDay - 1;
-        addNews();
+
+        NewsDatabase db = App.getInstance().getDatabase();
+        NewsDao newsDao = db.newsDao();
+        List<ItemNews> itemNewsList = newsDao.getAll();
 
         Map<Date, List<ItemNews>> groupNews = toMap(itemNewsList);
 
         for (Date date : groupNews.keySet()) {
             for (ItemNews itemNews : groupNews.get(date)) {
-                ItemNews item = new ItemNews(itemNews.getTitleNews(), itemNews.getDateNews(), itemNews.getDescriptionNews());
+                ItemNews item = new ItemNews(itemNews.getId(), itemNews.getTitleNews(), itemNews.getDateNews(), itemNews.getDescriptionNews());
                 itemsList.add(0, item);
             }
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
@@ -73,16 +75,6 @@ public class NewsListFragment extends Fragment {
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(getContext(), linearLayoutManager.getOrientation());
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.addItemDecoration(dividerItemDecoration);
-    }
-
-    private void addNews() {
-        itemNewsList.add(new ItemNews(getString(R.string.Title1), getString(R.string.Date1), getString(R.string.Description1)));
-        itemNewsList.add(new ItemNews(getString(R.string.Title2), getString(R.string.Date2), getString(R.string.Description2)));
-        itemNewsList.add(new ItemNews(getString(R.string.Title3), getString(R.string.Date3), getString(R.string.Description3)));
-        itemNewsList.add(new ItemNews(getString(R.string.Title4), getString(R.string.Date4), getString(R.string.Description4)));
-        itemNewsList.add(new ItemNews(getString(R.string.Title5), getString(R.string.Date5), getString(R.string.Description5)));
-        itemNewsList.add(new ItemNews(getString(R.string.Title6), getString(R.string.Date6), getString(R.string.Description6)));
-        itemNewsList.add(new ItemNews(getString(R.string.Title7), getString(R.string.Date7), getString(R.string.Description7)));
     }
 
     private Map<Date, List<ItemNews>> toMap(List<ItemNews> listNews) {

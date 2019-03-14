@@ -78,6 +78,7 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     @Override
     public int getItemViewType(int position) {
+
         return newsList.get(position).getType();
     }
 

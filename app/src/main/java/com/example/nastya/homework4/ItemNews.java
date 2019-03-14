@@ -3,14 +3,20 @@ package com.example.nastya.homework4;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+@Entity
 public class ItemNews extends ListItem implements Parcelable {
     public static final Creator<ItemNews> CREATOR = new Creator<ItemNews>() {
         @Override
         public ItemNews createFromParcel(Parcel in) {
+            int id = in.readInt();
             String titleNews = in.readString();
             String dateNews = in.readString();
             String descriptionNews = in.readString();
-            return new ItemNews(titleNews, dateNews, descriptionNews);
+            return new ItemNews(id, titleNews, dateNews, descriptionNews);
         }
 
         @Override
@@ -18,38 +24,32 @@ public class ItemNews extends ListItem implements Parcelable {
             return new ItemNews[size];
         }
     };
+    @PrimaryKey
+    private int id;
+    @ColumnInfo
     private String titleNews;
+    @ColumnInfo
     private String dateNews;
+    @ColumnInfo
     private String descriptionNews;
 
-    public ItemNews(String titleNews, String dateNews, String descriptionNews) {
+    public ItemNews(int id, String titleNews, String dateNews, String descriptionNews) {
+        this.id = id;
         this.titleNews = titleNews;
         this.dateNews = dateNews;
         this.descriptionNews = descriptionNews;
     }
 
-    public String getTitleNews() {
+    String getTitleNews() {
         return titleNews;
     }
 
-    public void setTitleNews(String titleNews) {
-        this.titleNews = titleNews;
-    }
-
-    public String getDateNews() {
+    String getDateNews() {
         return dateNews;
     }
 
-    public void setDateNews(String dateNews) {
-        this.dateNews = dateNews;
-    }
-
-    public String getDescriptionNews() {
+    String getDescriptionNews() {
         return descriptionNews;
-    }
-
-    public void setDescriptionNews(String descriptionNews) {
-        this.descriptionNews = descriptionNews;
     }
 
     @Override
@@ -59,6 +59,7 @@ public class ItemNews extends ListItem implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
         dest.writeString(titleNews);
         dest.writeString(dateNews);
         dest.writeString(descriptionNews);
@@ -67,5 +68,28 @@ public class ItemNews extends ListItem implements Parcelable {
     @Override
     public int getType() {
         return TYPE_NEWS;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+}
+
+@Entity
+class FavouritesNews {
+
+    @PrimaryKey
+    private int idFavourites;
+
+    FavouritesNews(int idFavourites) {
+        this.idFavourites = idFavourites;
+    }
+
+    public int getIdFavourites() {
+        return idFavourites;
     }
 }
