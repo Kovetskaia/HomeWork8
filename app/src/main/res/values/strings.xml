@@ -12,13 +12,13 @@
     <string name="Title5">Phasellus venenatis volutpat urna at.</string>
     <string name="Title6">Pellentesque vitae finibus orci, et.</string>
     <string name="Title7">Vestibulum consequat quis massa in.</string>
-    <string name="Date1">01.02.2019</string>
-    <string name="Date2">02.02.2019</string>
-    <string name="Date3">02.02.2019</string>
-    <string name="Date4">08.03.2019</string>
-    <string name="Date5">15.02.2019</string>
-    <string name="Date6">15.02.2019</string>
-    <string name="Date7">01.02.2019</string>
+    <string name="Date1">2019-1-2</string>
+    <string name="Date2">2019-2-2</string>
+    <string name="Date3">2019-2-2</string>
+    <string name="Date4">2019-2-3</string>
+    <string name="Date5">2019-3-2</string>
+    <string name="Date6">2019-3-15</string>
+    <string name="Date7">2019-3-14</string>
     <string name="Description1">Fusce commodo, mi in euismod molestie, eros massa maximus lectus,
         a facilisis tellus arcu in sapien. Pellentesque hendrerit ligula nunc, ac eleifend tortor efficitur et.
         Nulla eget tempor eros. Quisque convallis urna volutpat neque laoreet facilisis.
@@ -68,4 +68,5 @@
         Praesent vel rutrum metus. Sed in posuere ante. Nullam bibendum finibus consectetur.
         Vivamus vel felis a justo pulvinar gravida gravida in augue. Etiam venenatis arcu non neque elementum dictum.
         Nulla facilisi.</string>
+    <string name="addToFavourites">Новость добавлена в избранное</string>
 </resources>

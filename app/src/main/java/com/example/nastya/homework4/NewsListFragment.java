@@ -1,18 +1,14 @@
 package com.example.nastya.homework4;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import org.joda.time.LocalDate;
+
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -25,11 +21,8 @@ public class NewsListFragment extends Fragment {
     private List<ItemNews> itemNewsList = new ArrayList<>();
     private List<ListItem> itemsList = new ArrayList<>();
     private View rootView;
-    private Calendar calendar;
-    private int curDay;
-    private int curMonth;
-    private int curYear;
-    private int yesDay;
+    private LocalDate curDay;
+    private LocalDate yesDay;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -40,33 +33,23 @@ public class NewsListFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        calendar = Calendar.getInstance();
-        calendar.setTime(new Date());
-        curDay = calendar.get(Calendar.DAY_OF_MONTH);
-        curMonth = calendar.get(Calendar.MONTH) + 1;
-        curYear = calendar.get(Calendar.YEAR);
-        yesDay = curDay - 1;
+        curDay = LocalDate.now();
+        yesDay = curDay.minusDays(1);
+
         addNews();
+        Map<LocalDate, List<ItemNews>> groupNews = toMap(itemNewsList);
 
-        Map<Date, List<ItemNews>> groupNews = toMap(itemNewsList);
-
-        for (Date date : groupNews.keySet()) {
+        for (LocalDate date : groupNews.keySet()) {
             for (ItemNews itemNews : groupNews.get(date)) {
-                ItemNews item = new ItemNews(itemNews.getTitleNews(), itemNews.getDateNews(), itemNews.getDescriptionNews());
-                itemsList.add(0, item);
+                itemsList.add(0, itemNews);
             }
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-            String dateToString = dateFormat.format(date);
-            ItemDateGroup header = new ItemDateGroup(checkDate(date, dateToString));
+            ItemDateGroup header = new ItemDateGroup(checkDate(date));
             itemsList.add(0, header);
-
         }
 
         RecyclerView recyclerView = rootView.findViewById(R.id.recyclerView);
         recyclerView.setAdapter(new MyAdapter(itemsList, (position, news) -> {
-            Intent intent = new Intent(getContext(), NewsContent.class);
-            intent.putExtra(ItemNews.class.getSimpleName(), news);
-            startActivity(intent);
+            startActivity(NewsContentActivity.createIntent(getContext(), news));
         }));
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
@@ -85,19 +68,15 @@ public class NewsListFragment extends Fragment {
         itemNewsList.add(new ItemNews(getString(R.string.Title7), getString(R.string.Date7), getString(R.string.Description7)));
     }
 
-    private Map<Date, List<ItemNews>> toMap(List<ItemNews> listNews) {
-        List<ItemNews> newsGroup = null;
+    private Map<LocalDate, List<ItemNews>> toMap(List<ItemNews> listNews) {
+        List<ItemNews> newsGroup;
         String dateNews;
-        Date date = null;
-        Map<Date, List<ItemNews>> map = new TreeMap<>();
+        LocalDate date;
+        Map<LocalDate, List<ItemNews>> map = new TreeMap<>();
         for (ItemNews itemNews : listNews) {
             dateNews = itemNews.getDateNews();
-            try {
-                date = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).parse(dateNews);
-                newsGroup = map.get(date);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
+            date = LocalDate.parse(dateNews);
+            newsGroup = map.get(date);
 
             if (newsGroup == null) {
                 newsGroup = new ArrayList<>();
@@ -108,17 +87,14 @@ public class NewsListFragment extends Fragment {
         return map;
     }
 
-    private String checkDate(Date date, String dateNews) {
-        calendar.setTime(date);
+    private String checkDate(LocalDate date) {
 
-        if (curMonth == calendar.get(Calendar.MONTH) + 1 & curYear == calendar.get(Calendar.YEAR)) {
-            if (curDay == calendar.get(Calendar.DAY_OF_MONTH)) {
+        if (date.equals(curDay)) {
                 return getString(R.string.today);
             }
-            if (yesDay == calendar.get(Calendar.DAY_OF_MONTH)) {
+        if (date.equals(yesDay)) {
                 return getString(R.string.yesterday);
             }
-        }
-        return dateNews;
+        return date.toString();
     }
 }

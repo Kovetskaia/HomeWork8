@@ -1,13 +1,13 @@
 package com.example.nastya.homework4;
 
-public class ItemDateGroup extends ListItem {
-    String date;
+public class ItemDateGroup implements ListItem {
+    private String date;
 
-    public ItemDateGroup(String date) {
+    ItemDateGroup(String date) {
         this.date = date;
     }
 
-    public String getDate() {
+    String getDate() {
         return date;
     }
 

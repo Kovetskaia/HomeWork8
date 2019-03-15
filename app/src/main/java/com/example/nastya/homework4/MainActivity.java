@@ -15,6 +15,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     static final int COUNT_PAGES = 2;
     PagerAdapter pagerAdapter;
     ViewPager viewPager;
+    Fragment fragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
 
         @Override
         public Fragment getItem(int position) {
-            return position == 0 ? new NewsListFragment() : NewsFavouritesFragment.newInstance();
+            return position == 0 ? new NewsListFragment() : new NewsFavouritesFragment();
         }
 
         @Override
@@ -65,4 +66,6 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
             return COUNT_PAGES;
         }
     }
+
+
 }

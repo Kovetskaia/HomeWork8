@@ -1,6 +1,5 @@
 package com.example.nastya.homework4;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,18 +14,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class NewsFavouritesFragment extends Fragment {
-    private static NewsFavouritesFragment newsFavouritesFragment;
     private List<ListItem> newsList = new ArrayList<>();
     private View rootView;
 
-    public static NewsFavouritesFragment newInstance() {
-        newsFavouritesFragment = new NewsFavouritesFragment();
-        return newsFavouritesFragment;
-    }
-
-    public static NewsFavouritesFragment getInstance() {
-        return newsFavouritesFragment;
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -34,14 +24,12 @@ public class NewsFavouritesFragment extends Fragment {
         return rootView;
     }
 
-    public void addNews(ItemNews favouriteItemNews) {
-        newsList.add(new ItemNews(favouriteItemNews.getTitleNews(), favouriteItemNews.getDateNews(), favouriteItemNews.getDescriptionNews()));
+    void addNews(ItemNews favouriteItemNews) {
+        newsList.add(favouriteItemNews);
 
         RecyclerView recyclerView = rootView.findViewById(R.id.recyclerView);
         recyclerView.setAdapter(new MyAdapter(newsList, (position, news) -> {
-            Intent intent = new Intent(getContext(), NewsContent.class);
-            intent.putExtra(ItemNews.class.getSimpleName(), news);
-            startActivity(intent);
+            startActivity(NewsContentActivity.createIntent(getContext(), news));
         }));
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
