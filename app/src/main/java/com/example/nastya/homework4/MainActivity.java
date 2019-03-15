@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
 
         @Override
         public Fragment getItem(int position) {
-            return position == 0 ? new NewsListFragment() : NewsFavouritesFragment.newInstance();
+            return position == 0 ? new NewsListFragment() : new NewsFavouritesFragment();
         }
 
         @Override

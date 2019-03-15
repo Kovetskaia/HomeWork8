@@ -24,6 +24,7 @@ public class App extends Application {
 
         NewsDao newsDao = database.newsDao();
         if (newsDao.getCount() == 0) {
+
             ItemNews itemNews1 = new ItemNews(1, getString(R.string.Title1), getString(R.string.Date1), getString(R.string.Description1));
             newsDao.insert(itemNews1);
 
@@ -42,6 +43,14 @@ public class App extends Application {
             ItemNews itemNews5 = new ItemNews(5, getString(R.string.Title5), getString(R.string.Date5), getString(R.string.Description5));
             if (newsDao.getById(itemNews5.getId()) == null)
                 newsDao.insert(itemNews5);
+
+            ItemNews itemNews6 = new ItemNews(6, getString(R.string.Title6), getString(R.string.Date6), getString(R.string.Description6));
+            if (newsDao.getById(itemNews6.getId()) == null)
+                newsDao.insert(itemNews6);
+
+            ItemNews itemNews7 = new ItemNews(7, getString(R.string.Title7), getString(R.string.Date7), getString(R.string.Description7));
+            if (newsDao.getById(itemNews7.getId()) == null)
+                newsDao.insert(itemNews7);
         }
     }
 

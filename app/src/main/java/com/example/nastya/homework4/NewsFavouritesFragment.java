@@ -1,6 +1,5 @@
 package com.example.nastya.homework4;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,21 +16,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class NewsFavouritesFragment extends Fragment {
-    private static NewsFavouritesFragment newsFavouritesFragment;
     private Map<Integer, ListItem> mapNews = new HashMap<>();
     private List<ListItem> newsList = new ArrayList<>();
     private View rootView;
-    private NewsDatabase db;
     private NewsDao newsDao;
-
-    static NewsFavouritesFragment newInstance() {
-        newsFavouritesFragment = new NewsFavouritesFragment();
-        return newsFavouritesFragment;
-    }
-
-    static NewsFavouritesFragment getInstance() {
-        return newsFavouritesFragment;
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -42,7 +30,7 @@ public class NewsFavouritesFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        db = App.getInstance().getDatabase();
+        NewsDatabase db = App.getInstance().getDatabase();
         newsDao = db.newsDao();
         FavouritesNewsDao favouritesNewsDao = db.favouritesNewsDao();
         List<FavouritesNews> idNews = favouritesNewsDao.getAll();
@@ -68,18 +56,14 @@ public class NewsFavouritesFragment extends Fragment {
         if (change == 1) {
             newsList.remove(mapNews.get(id));
         }
-
-        if (newsList.size() != 0) {
             setAdapter();
-        }
     }
 
     private void setAdapter() {
         RecyclerView recyclerView = rootView.findViewById(R.id.recyclerView);
         recyclerView.setAdapter(new MyAdapter(newsList, (position, news) -> {
-            Intent intent = new Intent(getContext(), NewsContent.class);
-            intent.putExtra(ItemNews.class.getSimpleName(), news);
-            startActivity(intent);
+
+            startActivity(NewsContentActivity.createIntent(getContext(), news));
         }));
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());

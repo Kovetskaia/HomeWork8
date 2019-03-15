@@ -14,8 +14,6 @@ interface Listener {
 }
 
 public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private LayoutInflater inflater;
-
     private List<ListItem> newsList;
     private Listener listener;
 
@@ -27,7 +25,7 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view;
-        inflater = LayoutInflater.from(parent.getContext());
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         switch (viewType) {
             case ListItem.TYPE_DATE: {
                 view = inflater.inflate(R.layout.item_date_group, parent, false);
