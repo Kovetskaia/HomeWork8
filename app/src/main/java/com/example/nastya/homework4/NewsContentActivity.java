@@ -9,19 +9,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 public class NewsContentActivity extends AppCompatActivity {
-    final int ADD = 0;
-    final int DELETE = 1;
     ItemNews itemNews;
     FavouritesNewsDao favouritesNewsDao;
-    private static Fragment fragment;
     int id;
 
     public static Intent createIntent(Context context, ItemNews news) {
-        fragment = ((MainActivity) context).getSupportFragmentManager()
-                .findFragmentByTag("android:switcher:" + R.id.pager + ":" + 1);
         return new Intent(context, NewsContentActivity.class)
                 .putExtra(ItemNews.class.getSimpleName(), news);
     }
@@ -61,17 +56,21 @@ public class NewsContentActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem menuItem) {
 
         if (menuItem.getItemId() == R.id.favourites) {
+            Intent intent = new Intent();
+            intent.setAction("news_state_change");
             if (favouritesNewsDao.getById(id) == null) {
                 favouritesNewsDao.insert(new FavouritesNews(id));
-                if (fragment != null) {
-                    ((NewsFavouritesFragment) fragment).changeListFavouritesNews(ADD, id);
-                }
+
+                intent.putExtra("id_add", id);
+
+                LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+
                 menuItem.setIcon(R.drawable.added);
                 Toast.makeText(this, getString(R.string.addToFavourites), Toast.LENGTH_LONG).show();
             } else {
-                if (fragment != null) {
-                    ((NewsFavouritesFragment) fragment).changeListFavouritesNews(DELETE, id);
-                }
+                intent.putExtra("id_delete", id);
+                LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+
                 favouritesNewsDao.delete(favouritesNewsDao.getById(id));
                 menuItem.setIcon(R.drawable.not_added);
                 Toast.makeText(this, getString(R.string.deleteFromFavourites), Toast.LENGTH_LONG).show();
