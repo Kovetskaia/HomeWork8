@@ -6,8 +6,12 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+interface News {
+    int getId();
+}
+
 @Entity
-public class ItemNews implements ListItem, Serializable {
+public class ItemNews implements News, ListItem, Serializable{
 
     @PrimaryKey
     private int id;
@@ -37,7 +41,7 @@ public class ItemNews implements ListItem, Serializable {
         return descriptionNews;
     }
 
-    int getId() {
+    public int getId() {
         return id;
     }
 
@@ -45,19 +49,41 @@ public class ItemNews implements ListItem, Serializable {
     public int getType() {
         return TYPE_NEWS;
     }
+
+    @Override
+    public int hashCode() {
+        return this.id;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return this.id == ((News) obj).getId();
+    }
 }
 
 @Entity
-class FavouritesNews {
+class FavouritesNews implements News{
 
     @PrimaryKey
-    private int idFavourites;
+    private int id;
 
-    FavouritesNews(int idFavourites) {
-        this.idFavourites = idFavourites;
+    FavouritesNews(int id) {
+        this.id = id;
     }
 
-    int getIdFavourites() {
-        return idFavourites;
+    public int getId() {
+
+        return id;
     }
+
+    @Override
+    public int hashCode() {
+        return this.id;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return this.id == ((News) obj).getId();
+    }
+
 }

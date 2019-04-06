@@ -9,12 +9,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.observers.DisposableCompletableObserver;
+import io.reactivex.observers.DisposableSingleObserver;
+import io.reactivex.schedulers.Schedulers;
 
 public class NewsContentActivity extends AppCompatActivity {
     ItemNews itemNews;
     FavouritesNewsDao favouritesNewsDao;
+    FavouritesNews currentNews;
     int id;
+    Boolean starVisible = false;
 
     public static Intent createIntent(Context context, ItemNews news) {
         return new Intent(context, NewsContentActivity.class)
@@ -30,15 +35,35 @@ public class NewsContentActivity extends AppCompatActivity {
         TextView contentDescription = findViewById(R.id.contentDescription);
 
         itemNews = (ItemNews) getIntent().getSerializableExtra(ItemNews.class.getSimpleName());
+        id = itemNews.getId();
 
         setTitle(itemNews.getTitleNews());
         contentDate.setText(itemNews.getDateNews());
         contentDescription.setText(itemNews.getDescriptionNews());
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
         NewsDatabase db = App.getInstance().getDatabase();
         favouritesNewsDao = db.favouritesNewsDao();
-        id = itemNews.getId();
 
+        favouritesNewsDao.getById(id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+
+                .subscribe(new DisposableSingleObserver<FavouritesNews>() {
+                    @Override
+                    public void onSuccess(FavouritesNews favouritesNews) {
+                        starVisible = true;
+                        currentNews = favouritesNews;
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        starVisible = false;
+                    }
+                });
     }
 
     @Override
@@ -46,7 +71,7 @@ public class NewsContentActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu, menu);
 
         MenuItem favourites = menu.findItem(R.id.favourites);
-        if (favouritesNewsDao.getById(id) != null) {
+        if (starVisible) {
             favourites.setIcon(R.drawable.added);
         }
         return true;
@@ -54,26 +79,46 @@ public class NewsContentActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
-
         if (menuItem.getItemId() == R.id.favourites) {
-            Intent intent = new Intent();
-            intent.setAction("news_state_change");
-            if (favouritesNewsDao.getById(id) == null) {
-                favouritesNewsDao.insert(new FavouritesNews(id));
+            if (!starVisible) {
 
-                intent.putExtra("id_add", id);
+                currentNews = new FavouritesNews(id);
+                favouritesNewsDao.insert(currentNews)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
 
-                LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+                        .subscribe(new DisposableCompletableObserver() {
+                            @Override
+                            public void onComplete() {
+                                Toast.makeText(NewsContentActivity.this, getString(R.string.addedToFavourites), Toast.LENGTH_LONG).show();
+                                menuItem.setIcon(R.drawable.added);
+                                starVisible = true;
+                            }
 
-                menuItem.setIcon(R.drawable.added);
-                Toast.makeText(this, getString(R.string.addToFavourites), Toast.LENGTH_LONG).show();
+                            @Override
+                            public void onError(Throwable e) {
+                                Toast.makeText(NewsContentActivity.this, getString(R.string.notAddedToFavourites), Toast.LENGTH_LONG).show();
+                            }
+                        });
             } else {
-                intent.putExtra("id_delete", id);
-                LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 
-                favouritesNewsDao.delete(favouritesNewsDao.getById(id));
-                menuItem.setIcon(R.drawable.not_added);
-                Toast.makeText(this, getString(R.string.deleteFromFavourites), Toast.LENGTH_LONG).show();
+                favouritesNewsDao.delete(currentNews)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new DisposableCompletableObserver() {
+                            @Override
+                            public void onComplete() {
+                                Toast.makeText(NewsContentActivity.this, getString(R.string.deletedFromFavourites), Toast.LENGTH_LONG).show();
+                                menuItem.setIcon(R.drawable.not_added);
+                                starVisible = false;
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                Toast.makeText(NewsContentActivity.this, getString(R.string.notDeletedFromFavourites), Toast.LENGTH_LONG).show();
+                            }
+                        });
+
             }
             return true;
         }

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">HomeWork4</string>
+    <string name="app_name">HomeWork6</string>
     <string name="page">Page №%d</string>
     <string name="favourites">Избранное</string>
     <string name="latest">Последние</string>
@@ -16,7 +16,7 @@
     <string name="Date2">2019-2-2</string>
     <string name="Date3">2019-2-2</string>
     <string name="Date4">2019-2-3</string>
-    <string name="Date5">2019-3-2</string>
+    <string name="Date5">2019-3-15</string>
     <string name="Date6">2019-3-15</string>
     <string name="Date7">2019-3-14</string>
     <string name="Description1">Fusce commodo, mi in euismod molestie, eros massa maximus lectus,
@@ -68,6 +68,8 @@
         Praesent vel rutrum metus. Sed in posuere ante. Nullam bibendum finibus consectetur.
         Vivamus vel felis a justo pulvinar gravida gravida in augue. Etiam venenatis arcu non neque elementum dictum.
         Nulla facilisi.</string>
-    <string name="addToFavourites">Новость добавлена в избранное</string>
-    <string name="deleteFromFavourites">Новость удалена из избранного</string>
+    <string name="addedToFavourites">Новость добавлена в избранное</string>
+    <string name="notAddedToFavourites">Не удалось добавить новость в избранное</string>
+    <string name="deletedFromFavourites">Новость удалена из избранного</string>
+    <string name="notDeletedFromFavourites">Не удалось удалить новость из избранного</string>
 </resources>

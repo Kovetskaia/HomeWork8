@@ -3,12 +3,17 @@ package com.example.nastya.homework4;
 import android.app.Application;
 
 import androidx.room.Room;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.observers.DisposableCompletableObserver;
+import io.reactivex.schedulers.Schedulers;
 
 public class App extends Application {
 
     public static App instance;
 
     private NewsDatabase database;
+
+    NewsDao newsDao;
 
     public static App getInstance() {
         return instance;
@@ -18,42 +23,49 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         instance = this;
-        database = Room.databaseBuilder(this, NewsDatabase.class, "n5")
+        database = Room.databaseBuilder(this, NewsDatabase.class, "db")
                 .allowMainThreadQueries()
                 .build();
 
-        NewsDao newsDao = database.newsDao();
+        newsDao = database.newsDao();
         if (newsDao.getCount() == 0) {
-
             ItemNews itemNews1 = new ItemNews(1, getString(R.string.Title1), getString(R.string.Date1), getString(R.string.Description1));
-            newsDao.insert(itemNews1);
-
+                insertNews(itemNews1);
             ItemNews itemNews2 = new ItemNews(2, getString(R.string.Title2), getString(R.string.Date2), getString(R.string.Description2));
-            if (newsDao.getById(itemNews2.getId()) == null)
-                newsDao.insert(itemNews2);
+            insertNews(itemNews2);
 
             ItemNews itemNews3 = new ItemNews(3, getString(R.string.Title3), getString(R.string.Date3), getString(R.string.Description3));
-            if (newsDao.getById(itemNews3.getId()) == null)
-                newsDao.insert(itemNews3);
+            insertNews(itemNews3);
 
             ItemNews itemNews4 = new ItemNews(4, getString(R.string.Title4), getString(R.string.Date4), getString(R.string.Description4));
-            if (newsDao.getById(itemNews4.getId()) == null)
-                newsDao.insert(itemNews4);
+            insertNews(itemNews4);
 
             ItemNews itemNews5 = new ItemNews(5, getString(R.string.Title5), getString(R.string.Date5), getString(R.string.Description5));
-            if (newsDao.getById(itemNews5.getId()) == null)
-                newsDao.insert(itemNews5);
+            insertNews(itemNews5);
 
             ItemNews itemNews6 = new ItemNews(6, getString(R.string.Title6), getString(R.string.Date6), getString(R.string.Description6));
-            if (newsDao.getById(itemNews6.getId()) == null)
-                newsDao.insert(itemNews6);
+            insertNews(itemNews6);
 
             ItemNews itemNews7 = new ItemNews(7, getString(R.string.Title7), getString(R.string.Date7), getString(R.string.Description7));
-            if (newsDao.getById(itemNews7.getId()) == null)
-                newsDao.insert(itemNews7);
+            insertNews(itemNews7);
         }
     }
+    void insertNews(ItemNews news) {
+        newsDao.insert(news)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new DisposableCompletableObserver() {
+                    @Override
+                    public void onComplete() {
 
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+                });
+    }
     public NewsDatabase getDatabase() {
         return database;
     }

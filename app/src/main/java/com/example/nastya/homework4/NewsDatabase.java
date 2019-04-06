@@ -2,41 +2,46 @@ package com.example.nastya.homework4;
 
 import java.util.List;
 
+
 import androidx.room.Dao;
 import androidx.room.Database;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.RoomDatabase;
+import io.reactivex.Completable;
+import io.reactivex.Flowable;
+import io.reactivex.Observable;
+import io.reactivex.Single;
 
 @Dao
 interface NewsDao {
     @Query("SELECT * FROM itemnews")
-    List<ItemNews> getAll();
+    Flowable<List<ItemNews>> getAll();
 
-    @Query("SELECT * FROM itemnews WHERE id = :id")
-    ItemNews getById(long id);
+    @Query("SELECT * FROM itemnews WHERE id IN (:ids)")
+    Single<List<ItemNews>> getByIds(List<Long> ids);
 
     @Query("SELECT COUNT(*) FROM itemnews")
     int getCount();
 
     @Insert
-    void insert(ItemNews news);
+    Completable insert(ItemNews news);
 }
 
 @Dao
 interface FavouritesNewsDao {
     @Query("SELECT * FROM favouritesnews")
-    List<FavouritesNews> getAll();
+    Flowable<List<FavouritesNews>> getAll();
 
-    @Query("SELECT * FROM favouritesnews WHERE idFavourites = :id")
-    FavouritesNews getById(long id);
+    @Query("SELECT * FROM favouritesnews WHERE id = :id")
+    Single<FavouritesNews> getById(long id);
 
     @Insert
-    void insert(FavouritesNews favouritesNews);
+    Completable insert(FavouritesNews favouritesNews);
 
     @Delete
-    void delete(FavouritesNews favouritesNews);
+    Completable delete(FavouritesNews favouritesNews);
 
 }
 
