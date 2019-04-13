@@ -1,9 +1,14 @@
 package com.example.nastya.homework4;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.util.List;
 
@@ -16,10 +21,12 @@ interface Listener {
 public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<ListItem> newsList;
     private Listener listener;
+    private DateTimeFormatter dateFormat = DateTimeFormat.forPattern("yyyy-MMMM-dd");
 
     MyAdapter(List<ListItem> news, Listener listener) {
         this.newsList = news;
         this.listener = listener;
+        Log.d("myLogs", "failure2 ");
     }
 
     @Override
@@ -53,15 +60,18 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         int viewType = getItemViewType(position);
         switch (viewType) {
             case ListItem.TYPE_DATE: {
+                Log.d("myLogs", "failure0 ");
                 ItemDateGroup itemDateGroup = (ItemDateGroup) newsList.get(position);
                 ((DataGroupViewHolder) holder).textTitle.setText(itemDateGroup.getDate());
                 break;
             }
             case ListItem.TYPE_NEWS: {
+
                 ItemNews itemNews = (ItemNews) newsList.get(position);
-                ((NewsViewHolder) holder).titleNews.setText(itemNews.getTitleNews());
-                ((NewsViewHolder) holder).dateNews.setText(itemNews.getDateNews());
-                ((NewsViewHolder) holder).descriptionNews.setText(itemNews.getDescriptionNews());
+               // Log.d("myLogs", "failure1 " + itemNews.getText());
+                ((NewsViewHolder) holder).titleNews.setText(itemNews.getText());
+//                ((NewsViewHolder) holder).dateNews.setText(dateFormat.print(itemNews.getDateNews()));
+ //              ((NewsViewHolder) holder).descriptionNews.setText(itemNews.getText());
                 break;
             }
             default:

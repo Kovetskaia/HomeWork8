@@ -1,6 +1,7 @@
 package com.example.nastya.homework4;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import com.google.android.material.tabs.TabLayout;
 
@@ -64,5 +65,11 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         public int getCount() {
             return COUNT_PAGES;
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d("myLogs", "onDestroyActivity ");
     }
 }
