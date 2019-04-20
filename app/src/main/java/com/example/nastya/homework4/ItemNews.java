@@ -12,34 +12,22 @@ interface News {
 }
 
 @Entity
-public class ItemNews implements ListItem, Serializable{
+public class ItemNews implements News, ListItem, Serializable {
 
     @PrimaryKey
     private int id;
     @ColumnInfo
     private String text;
+    @Embedded
+    private PublicationDate publicationDate;
     @ColumnInfo
-    private long date;
-    @ColumnInfo
-    private String description;
+    private String descriptionNews;
 
-    public long getDate() {
-        return date;
-    }
-
-    public void setDate(long date) {
-        this.date = date;
-    }
-
-    //    @Embedded
-//    private PublicationDate publicationDate;
-
-
-    ItemNews(int id, String text, long date, String description){
+    ItemNews(int id, String text, PublicationDate publicationDate, String descriptionNews) {
         this.id = id;
         this.text = text;
-        this.date = date;
-        this.description = description;
+        this.publicationDate = publicationDate;
+        this.descriptionNews = descriptionNews;
     }
 
     public int getId() {
@@ -50,7 +38,7 @@ public class ItemNews implements ListItem, Serializable{
         this.id = id;
     }
 
-    public String getText() {
+    String getText() {
         return text;
     }
 
@@ -58,56 +46,21 @@ public class ItemNews implements ListItem, Serializable{
         this.text = text;
     }
 
-    public String getDescription() {
-        return description;
+    PublicationDate getPublicationDate() {
+        return publicationDate;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setPublicationDate(PublicationDate publicationDate) {
+        this.publicationDate = publicationDate;
     }
 
-//
-//    public PublicationDate getPublicationDate() {
-//        return publicationDate;
-//    }
-//
-//    public void setPublicationDate(PublicationDate publicationDate) {
-//        this.publicationDate = publicationDate;
-//    }
+    String getDescriptionNews() {
+        return descriptionNews;
+    }
 
-
-
-
-
-//    @ColumnInfo
-//    private String descriptionNews;
-
-//    ItemNews(int id, String titleNews, PublicationDate dateNews) {
-//        this.id = id;
-//        this.titleNews = titleNews;
-//        this.publicationDate = dateNews;
-//       // this.descriptionNews = descriptionNews;
-//    }
-
-//    String getTitleNews() {
-//        return titleNews;
-//    }
-//
-//    public PublicationDate getPublicationDate() {
-//        return publicationDate;
-//    }
-//
-//    public void setPublicationDate(PublicationDate publicationDate) {
-//        this.publicationDate = publicationDate;
-//    }
-//
-////    String getDescriptionNews() {
-////        return descriptionNews;
-////    }
-//
-//    public long getId() {
-//        return id;
-//    }
+    void setDescriptionNews(String descriptionNews) {
+        this.descriptionNews = descriptionNews;
+    }
 
     @Override
     public int getType() {
@@ -126,10 +79,15 @@ public class ItemNews implements ListItem, Serializable{
 }
 
 
-class PublicationDate {
+class PublicationDate implements Serializable {
+    @ColumnInfo(name = "date")
     private long milliseconds;
 
-    public long getMilliseconds() {
+    PublicationDate(long milliseconds) {
+        this.milliseconds = milliseconds;
+    }
+
+    long getMilliseconds() {
         return milliseconds;
     }
 
@@ -137,11 +95,10 @@ class PublicationDate {
         this.milliseconds = milliseconds;
     }
 
-
 }
 
 @Entity
-class FavouritesNews {
+class FavouritesNews implements News {
 
     @PrimaryKey
     private int id;

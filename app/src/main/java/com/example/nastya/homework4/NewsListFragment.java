@@ -1,7 +1,9 @@
 package com.example.nastya.homework4;
 
+import android.app.AlertDialog;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,23 +19,26 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import static android.content.Context.CONNECTIVITY_SERVICE;
 
 public class NewsListFragment extends Fragment {
+    private final CompositeDisposable mDisposable = new CompositeDisposable();
     private List<ListItem> itemsList = new ArrayList<>();
-    private List<ItemNews> itemsListForDelete = new ArrayList<>();
     private Long oldDate;
-    private View rootView;
     private LocalDate curDay;
     private LocalDate yesDay;
-    private NewsDatabase db;
     private NewsDao newsDao;
     private MyAdapter myAdapter;
-    private RecyclerView recyclerView;
-    private final CompositeDisposable mDisposable = new CompositeDisposable();
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private MyDataApi api;
     private DateTimeFormatter dateFormat = DateTimeFormat.forPattern("yyyy-MM-dd");
 
     @Override
@@ -43,96 +48,226 @@ public class NewsListFragment extends Fragment {
         curDay = LocalDate.now();
         yesDay = curDay.minusDays(1);
 
-        db = App.getInstance().getDatabase();
+        NewsDatabase db = App.getInstance().getDatabase();
         newsDao = db.newsDao();
-
-        mDisposable.add(newsDao.getAll()
-//                .map(itemNewsList -> {
-//                    if(itemNewsList.size() != 0) {
-//
-//                        //LocalDate localDate = new LocalDate(itemNewsList.get(0).getDateNews());
-//                        long dateInMilliseconds = itemNewsList.get(0).getPublicationDate().getMilliseconds();
-//                        itemsList.add(new ItemDateGroup(checkDate(dateFormat.print(dateInMilliseconds))));
-//
-//                        for (ItemNews i : itemNewsList) {
-//
-//                            if (i.getPublicationDate().getMilliseconds() == dateInMilliseconds){
-//                                itemsList.add(i);
-//                            } else {
-//                                dateInMilliseconds = i.getPublicationDate().getMilliseconds();
-//                               // localDate = new LocalDate(l);
-//                                itemsList.add(new ItemDateGroup(checkDate(dateFormat.print(dateInMilliseconds))));
-//                                itemsList.add(i);
-//                            }
-//                        }
-//                        return itemsList;
-//                    }else {
-//                        itemsList.clear();
-//                        return itemsList;
-//                    }
-//                })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<List<ItemNews>>() {
-                    @Override
-                    public void accept(List<ItemNews> listItems) throws Exception {
-                        Log.d("myLogs", "DB " + listItems);
-                        itemsList.clear();
-                        itemsList.addAll(listItems);
-                        Log.d("myLogs", "itemsList " + itemsList);
-                        startInsert();
-                        //itemsListForDelete.addAll(listItems.subList(5,listItems.size()));
-                        oldDate = ((ItemNews) itemsList.get(itemsList.size()-1)).getDate();
-                        Log.d("myLogs", "itemsListForDelete " + oldDate);
-                        startDelete();
-//                        if(listItems.size()>100){
-//                        itemsList.addAll(listItems.subList(0,99));
-//                            startInsert();
-//                        itemsListForDelete.addAll(listItems.subList(100,listItems.size()));
-//                            getFavourites();
-//                        }else {
-//
-//
-//                        }
-                    }
-                }));
-
-
+        api = Client.getClientInstance().getMyDataApi();
+        initData();
 
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.fragment, container, false);
-        return rootView;
+        View rootView = inflater.inflate(R.layout.fragment, container, false);
+        swipeRefreshLayout = new SwipeRefreshLayout(container.getContext());
+
+        swipeRefreshLayout.addView(rootView,
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        swipeRefreshLayout.setLayoutParams(
+                new ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT));
+        return swipeRefreshLayout;
+
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        recyclerView = rootView.findViewById(R.id.recyclerView);
-        myAdapter = new MyAdapter(itemsList, (position, news) ->
-                NewsListFragment.this.startActivity(NewsContentActivity.createIntent(NewsListFragment.this.getContext(), news)));
+        RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
+        myAdapter = new MyAdapter(itemsList, (position, news) -> {
+            if (news.getDescriptionNews() != null) {
+                startNewsContentActivity(news);
+            } else {
+                getContent(news.getId());
+            }
+        });
+
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(requireContext(), linearLayoutManager.getOrientation());
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.addItemDecoration(dividerItemDecoration);
-    }
-
-     private void startInsert(){
         recyclerView.setAdapter(myAdapter);
+        swipeRefreshLayout.setOnRefreshListener(this::initData);
 
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mDisposable.clear();
 
-    private void startDelete() {
-        mDisposable.add(newsDao.delete(oldDate)
+    }
+
+    private void initData() {
+        if (checkConnection()) {
+            getDataFromServer();
+        } else {
+            swipeRefreshSetFalse();
+            onCreateDialog(getString(R.string.titleConnectionError), getString(R.string.messageConnectionError));
+        }
+
+    }
+
+    private boolean checkConnection() {
+        ConnectivityManager cm =
+                (ConnectivityManager) getContext().getSystemService(CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+
+    }
+
+    private void getDataFromServer() {
+        Call<AllNews> myData = api.myData();
+
+        myData.enqueue(new Callback<AllNews>() {
+            @Override
+            public void onResponse(Call<AllNews> call, Response<AllNews> response) {
+                if (response.isSuccessful()) {
+                    List<ItemNews> newsFromNetwork = response.body().getPayload().subList(0, 100);
+
+                    if (newsFromNetwork.size() != 0) {
+                        if (needUpdate(newsFromNetwork)) {
+                            groupByDate(newsFromNetwork);
+                            oldDate = ((ItemNews) itemsList.get(itemsList.size() - 1)).getPublicationDate().getMilliseconds();
+                            updateAdapter();
+                            insertNewsToDB(newsFromNetwork);
+                        } else {
+                            swipeRefreshSetFalse();
+                        }
+                    }
+                } else {
+                    onCreateDialog(getString(R.string.titleConnectionError), getString(R.string.messageConnectionError));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<AllNews> call, Throwable t) {
+                onCreateDialog(getString(R.string.titleRequestFailed), getString(R.string.messageRequestFailed));
+            }
+        });
+
+    }
+
+    private void getContentFromServer(ItemNews itemNews) {
+        Call<Content> getDescription = api.getDescription(itemNews.getId());
+
+        getDescription.enqueue(new Callback<Content>() {
+            @Override
+            public void onResponse(Call<Content> call, Response<Content> response) {
+                if (response.isSuccessful()) {
+                    String description = response.body().getPayload().getContent();
+                    itemNews.setDescriptionNews(description);
+                    startNewsContentActivity(itemNews);
+                    insertContentToDB(itemNews);
+                } else {
+                    onCreateDialog(getString(R.string.titleConnectionError), getString(R.string.messageConnectionError));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Content> call, Throwable t) {
+                onCreateDialog(getString(R.string.titleRequestFailed), getString(R.string.messageRequestFailed));
+            }
+        });
+
+    }
+
+    private void getDataFromDB() {
+        mDisposable.add(newsDao.getAll()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe());
-        Log.d("myLogs", "startDelete ");
+                .subscribe(listItems -> {
+                    if (listItems.size() != 0) {
+                        groupByDate(listItems);
+                    }
+                    updateAdapter();
+
+                }));
 
     }
 
+    private void getContent(int id) {
+        mDisposable.add(newsDao.getById(id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(itemNews -> {
+                    if (itemNews.getDescriptionNews() != null) {
+                        startNewsContentActivity(itemNews);
+                    } else {
+                        if (checkConnection()) {
+                            getContentFromServer(itemNews);
+                        } else {
+                            onCreateDialog(getString(R.string.titleConnectionError), getString(R.string.messageConnectionError));
+                        }
+                    }
+                }));
+
+    }
+
+    private void insertNewsToDB(List<ItemNews> news) {
+        mDisposable.add(newsDao.insert(news)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::deleteOldNewsFromDB, error -> {
+
+                }));
+
+    }
+
+    private void insertContentToDB(ItemNews news) {
+        mDisposable.add(newsDao.insertContent(news.getDescriptionNews(), news.getId())
+                .subscribeOn(Schedulers.io())
+                .subscribe());
+
+    }
+
+    private void deleteOldNewsFromDB() {
+        mDisposable.add(newsDao.delete(oldDate)
+                .subscribeOn(Schedulers.io())
+                .subscribe());
+
+    }
+
+    private boolean needUpdate(List<ItemNews> list) {
+        if (itemsList.size() != 0) {
+            long maxDate = ((ItemNews) itemsList.get(1)).getPublicationDate().getMilliseconds();
+            for (ItemNews i : list) {
+                if (i.getPublicationDate().getMilliseconds() > maxDate) {
+                    return true;
+                }
+            }
+        } else {
+            return true;
+        }
+        return false;
+
+    }
+
+
+    private void updateAdapter() {
+        myAdapter.notifyDataSetChanged();
+        swipeRefreshSetFalse();
+
+    }
+
+    private void groupByDate(List<ItemNews> listForGroup) {
+        itemsList.clear();
+        String dateInMilliseconds = dateFormat.print(listForGroup.get(0).getPublicationDate().getMilliseconds());
+        itemsList.add(new ItemDateGroup(NewsListFragment.this.checkDate(dateInMilliseconds)));
+
+        for (ItemNews i : listForGroup) {
+
+            if (dateFormat.print(i.getPublicationDate().getMilliseconds()).equals(dateInMilliseconds)) {
+                itemsList.add(i);
+            } else {
+                dateInMilliseconds = dateFormat.print(i.getPublicationDate().getMilliseconds());
+                itemsList.add(new ItemDateGroup(NewsListFragment.this.checkDate(dateInMilliseconds)));
+                itemsList.add(i);
+            }
+        }
+
+    }
 
     private String checkDate(String date) {
 
@@ -145,11 +280,31 @@ public class NewsListFragment extends Fragment {
         return date;
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        Log.d("myLogs", "onDestroyView ");
-        mDisposable.clear();
+    private void onCreateDialog(String title, String message) {
+        AlertDialog.Builder dialogWindow = new AlertDialog.Builder(getContext());
+        dialogWindow.setTitle(title);
+        dialogWindow.setMessage(message);
+        dialogWindow.setIcon(android.R.drawable.ic_dialog_info);
+        dialogWindow.setPositiveButton(R.string.ok,
+                (dialog, which) -> {
+                    if (itemsList.size() == 0) {
+                        getDataFromDB();
+                    }
+                    dialog.cancel();
+                });
+        dialogWindow.setCancelable(false);
+        dialogWindow.show();
 
     }
+
+    private void startNewsContentActivity(ItemNews news) {
+        NewsListFragment.this.startActivity(NewsContentActivity.createIntent(NewsListFragment.this.getContext(), news));
+
+    }
+
+    private void swipeRefreshSetFalse() {
+        swipeRefreshLayout.setRefreshing(false);
+
+    }
+
 }

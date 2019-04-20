@@ -3,19 +3,18 @@ package com.example.nastya.homework4;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import androidx.appcompat.app.AppCompatActivity;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.observers.DisposableCompletableObserver;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 
@@ -43,9 +42,12 @@ public class NewsContentActivity extends AppCompatActivity {
         ItemNews itemNews = (ItemNews) getIntent().getSerializableExtra(ItemNews.class.getSimpleName());
         id = itemNews.getId();
 
+        CharSequence styledString = Html.fromHtml(itemNews.getDescriptionNews());
+        contentDescription.setText(styledString);
+
+        contentDate.setText(dateFormat.print(itemNews.getPublicationDate().getMilliseconds()));
         setTitle(itemNews.getText());
-//        contentDate.setText(dateFormat.print(itemNews.getDateNews()));
-//        contentDescription.setText(itemNews.getDescriptionNews());
+
     }
 
     @Override
@@ -57,7 +59,6 @@ public class NewsContentActivity extends AppCompatActivity {
         mDisposable.add(favouritesNewsDao.getById(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-
                 .subscribeWith(new DisposableSingleObserver<FavouritesNews>() {
                     @Override
                     public void onSuccess(FavouritesNews favouritesNews) {
@@ -92,38 +93,22 @@ public class NewsContentActivity extends AppCompatActivity {
                 mDisposable.add(favouritesNewsDao.insert(currentNews)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
-
-                        .subscribeWith(new DisposableCompletableObserver() {
-                            @Override
-                            public void onComplete() {
-                                Toast.makeText(NewsContentActivity.this, getString(R.string.addedToFavourites), Toast.LENGTH_LONG).show();
-                                menuItem.setIcon(R.drawable.added);
-                                starVisible = true;
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-                                Toast.makeText(NewsContentActivity.this, getString(R.string.notAddedToFavourites), Toast.LENGTH_LONG).show();
-                            }
-                        }));
+                        .subscribe(() -> {
+                                    Toast.makeText(NewsContentActivity.this, getString(R.string.addedToFavourites), Toast.LENGTH_LONG).show();
+                                    menuItem.setIcon(R.drawable.added);
+                                    starVisible = true;
+                                }, throwable -> Toast.makeText(NewsContentActivity.this, getString(R.string.notAddedToFavourites), Toast.LENGTH_LONG).show()
+                        ));
             } else {
 
                 mDisposable.add(favouritesNewsDao.delete(currentNews)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeWith(new DisposableCompletableObserver() {
-                            @Override
-                            public void onComplete() {
-                                Toast.makeText(NewsContentActivity.this, getString(R.string.deletedFromFavourites), Toast.LENGTH_LONG).show();
-                                menuItem.setIcon(R.drawable.not_added);
-                                starVisible = false;
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-                                Toast.makeText(NewsContentActivity.this, getString(R.string.notDeletedFromFavourites), Toast.LENGTH_LONG).show();
-                            }
-                        }));
+                        .subscribe(() -> {
+                            Toast.makeText(NewsContentActivity.this, getString(R.string.deletedFromFavourites), Toast.LENGTH_LONG).show();
+                            menuItem.setIcon(R.drawable.not_added);
+                            starVisible = false;
+                        }, throwable -> Toast.makeText(NewsContentActivity.this, getString(R.string.notDeletedFromFavourites), Toast.LENGTH_LONG).show()));
 
             }
             return true;

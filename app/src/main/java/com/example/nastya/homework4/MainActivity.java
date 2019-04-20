@@ -3,6 +3,7 @@ package com.example.nastya.homework4;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.facebook.stetho.Stetho;
 import com.google.android.material.tabs.TabLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,6 +22,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Stetho.initializeWithDefaults(this);
         pagerAdapter = new MyFragmentPagerAdapter(getSupportFragmentManager());
 
         viewPager = findViewById(R.id.pager);
