@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,6 +48,7 @@ public class NewsListFragment extends Fragment {
     private SwipeRefreshLayout swipeRefreshLayout;
     private NewsService api;
     private DateTimeFormatter dateFormat = DateTimeFormat.forPattern("yyyy-MM-dd");
+    private static final String TAG = NewsListFragment.class.getSimpleName();
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -67,12 +69,7 @@ public class NewsListFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment, container, false);
         swipeRefreshLayout = new SwipeRefreshLayout(container.getContext());
 
-        swipeRefreshLayout.addView(rootView,
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        swipeRefreshLayout.setLayoutParams(
-                new ViewGroup.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.MATCH_PARENT));
+        swipeRefreshLayout.addView(rootView);
         return swipeRefreshLayout;
 
     }
@@ -158,9 +155,9 @@ public class NewsListFragment extends Fragment {
                     @Override
                     public void onSuccess(ServerResponse<ServerNewsItemDetails> serverNewsItemDetailsServerResponse) {
                         String description = serverNewsItemDetailsServerResponse.getPayload().getContent();
-                    itemNews.setDescriptionNews(description);
-                    startNewsContentActivity(itemNews);
-                    insertContentToDB(itemNews);
+                        itemNews.setDescriptionNews(description);
+                        startNewsContentActivity(itemNews);
+                        insertContentToDB(itemNews);
                     }
 
                     @Override
@@ -177,11 +174,11 @@ public class NewsListFragment extends Fragment {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(listItems -> {
                     if (listItems.size() != 0) {
-                        groupByDate(listItems);
+                        NewsListFragment.this.groupByDate(listItems);
                     }
-                    updateAdapter();
+                    NewsListFragment.this.updateAdapter();
 
-                }));
+                }, throwable -> Log.e(TAG, "Unable to get data", throwable)));
 
     }
 
@@ -207,9 +204,8 @@ public class NewsListFragment extends Fragment {
         mDisposable.add(itemNewsDao.insert(news)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::deleteOldNewsFromDB, error -> {
-
-                }));
+                .subscribe(this::deleteOldNewsFromDB,
+                        error -> Log.e(TAG, "Unable to insert data", error)));
 
     }
 

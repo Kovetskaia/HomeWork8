@@ -1,8 +1,5 @@
 package com.example.nastya.homework4.ui;
 
-import com.example.nastya.homework4.database.News;
-import com.example.nastya.homework4.database.PublicationDate;
-
 import java.io.Serializable;
 
 import androidx.room.ColumnInfo;
@@ -22,7 +19,7 @@ public class ItemNews implements News, ListItem, Serializable {
     @ColumnInfo
     private String descriptionNews;
 
-    ItemNews(int id, String text, PublicationDate publicationDate, String descriptionNews) {
+    public ItemNews(int id, String text, PublicationDate publicationDate, String descriptionNews) {
         this.id = id;
         this.text = text;
         this.publicationDate = publicationDate;

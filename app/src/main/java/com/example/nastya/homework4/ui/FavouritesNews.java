@@ -1,7 +1,5 @@
 package com.example.nastya.homework4.ui;
 
-import com.example.nastya.homework4.database.News;
-
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 

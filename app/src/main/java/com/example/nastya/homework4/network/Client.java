@@ -9,7 +9,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class Client {
     private static Client clientInstance = new Client();
-    private static NewsService myDataApi;
+    private static NewsService newsService;
 
     private Client() {
         Retrofit retrofit = new Retrofit.Builder()
@@ -18,7 +18,7 @@ public class Client {
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
                 .build();
 
-        myDataApi = retrofit.create(NewsService.class);
+        newsService = retrofit.create(NewsService.class);
     }
 
     public static Client getClientInstance() {
@@ -26,7 +26,7 @@ public class Client {
     }
 
     public NewsService getMyDataApi() {
-        return myDataApi;
+        return newsService;
     }
 
 }

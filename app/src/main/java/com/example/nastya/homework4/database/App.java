@@ -10,8 +10,6 @@ public class App extends Application {
 
     private NewsDatabase database;
 
-    ItemNewsDao itemNewsDao;
-
     public static App getInstance() {
         return instance;
     }
@@ -21,10 +19,7 @@ public class App extends Application {
         super.onCreate();
         instance = this;
         database = Room.databaseBuilder(this, NewsDatabase.class, "db")
-                .allowMainThreadQueries()
                 .build();
-
-        itemNewsDao = database.newsDao();
 
     }
 
