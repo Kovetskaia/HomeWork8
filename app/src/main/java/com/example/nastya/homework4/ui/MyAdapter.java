@@ -1,17 +1,15 @@
-package com.example.nastya.homework4;
+package com.example.nastya.homework4.ui;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.nastya.homework4.R;
+
 import java.util.List;
 
 import androidx.recyclerview.widget.RecyclerView;
-
-interface Listener {
-    void onUserClick(int position, ItemNews n);
-}
 
 public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<ListItem> newsList;

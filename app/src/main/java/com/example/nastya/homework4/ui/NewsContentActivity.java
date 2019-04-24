@@ -1,4 +1,4 @@
-package com.example.nastya.homework4;
+package com.example.nastya.homework4.ui;
 
 import android.content.Context;
 import android.content.Intent;
@@ -8,6 +8,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.nastya.homework4.R;
+import com.example.nastya.homework4.database.App;
+import com.example.nastya.homework4.database.FavouritesNewsDao;
+import com.example.nastya.homework4.database.NewsDatabase;
 
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;

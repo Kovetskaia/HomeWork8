@@ -1,4 +1,4 @@
-package com.example.nastya.homework4;
+package com.example.nastya.homework4.database;
 
 import android.app.Application;
 
@@ -10,7 +10,7 @@ public class App extends Application {
 
     private NewsDatabase database;
 
-    NewsDao newsDao;
+    ItemNewsDao itemNewsDao;
 
     public static App getInstance() {
         return instance;
@@ -24,7 +24,7 @@ public class App extends Application {
                 .allowMainThreadQueries()
                 .build();
 
-        newsDao = database.newsDao();
+        itemNewsDao = database.newsDao();
 
     }
 

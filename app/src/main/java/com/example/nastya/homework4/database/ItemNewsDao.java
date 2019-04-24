@@ -1,20 +1,18 @@
-package com.example.nastya.homework4;
+package com.example.nastya.homework4.database;
+
+import com.example.nastya.homework4.ui.ItemNews;
 
 import java.util.List;
 
 import androidx.room.Dao;
-import androidx.room.Database;
-import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
-import androidx.room.RoomDatabase;
 import io.reactivex.Completable;
-import io.reactivex.Flowable;
 import io.reactivex.Single;
 
 @Dao
-interface NewsDao {
+public interface ItemNewsDao {
 
     @Query("SELECT * FROM itemnews ORDER BY date DESC LIMIT 100")
     Single<List<ItemNews>> getAll();
@@ -36,27 +34,3 @@ interface NewsDao {
 
 
 }
-
-@Dao
-interface FavouritesNewsDao {
-    @Query("SELECT * FROM favouritesnews")
-    Flowable<List<FavouritesNews>> getAll();
-
-    @Query("SELECT * FROM favouritesnews WHERE id = :id")
-    Single<FavouritesNews> getById(long id);
-
-    @Insert
-    Completable insert(FavouritesNews favouritesNews);
-
-    @Delete
-    Completable delete(FavouritesNews favouritesNews);
-
-}
-
-@Database(entities = {ItemNews.class, FavouritesNews.class}, version = 1, exportSchema = false)
-public abstract class NewsDatabase extends RoomDatabase {
-    public abstract NewsDao newsDao();
-
-    public abstract FavouritesNewsDao favouritesNewsDao();
-}
-

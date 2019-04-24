@@ -1,9 +1,15 @@
-package com.example.nastya.homework4;
+package com.example.nastya.homework4.ui;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.example.nastya.homework4.R;
+import com.example.nastya.homework4.database.App;
+import com.example.nastya.homework4.database.FavouritesNewsDao;
+import com.example.nastya.homework4.database.ItemNewsDao;
+import com.example.nastya.homework4.database.NewsDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +27,7 @@ public class NewsFavouritesFragment extends Fragment {
     private final CompositeDisposable mDisposable = new CompositeDisposable();
     private List<ListItem> newsList = new ArrayList<>();
     private List<FavouritesNews> currentFavouritesNews = new ArrayList<>();
-    private NewsDao newsDao;
+    private ItemNewsDao itemNewsDao;
     private List<FavouritesNews> idToDelete = new ArrayList<>();
     private List<Long> idNews = new ArrayList<>();
     private MyAdapter myAdapter;
@@ -30,7 +36,7 @@ public class NewsFavouritesFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         NewsDatabase db = App.getInstance().getDatabase();
-        newsDao = db.newsDao();
+        itemNewsDao = db.newsDao();
         FavouritesNewsDao favouritesNewsDao = db.favouritesNewsDao();
 
         mDisposable.add(favouritesNewsDao.getAll()
@@ -97,7 +103,7 @@ public class NewsFavouritesFragment extends Fragment {
             for (FavouritesNews i : news) {
                 idNews.add((long) i.getId());
             }
-            mDisposable.add(newsDao.getByIds(idNews)
+            mDisposable.add(itemNewsDao.getByIds(idNews)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeWith(new DisposableSingleObserver<List<ItemNews>>() {

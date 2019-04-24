@@ -1,4 +1,7 @@
-package com.example.nastya.homework4;
+package com.example.nastya.homework4.ui;
+
+import com.example.nastya.homework4.database.News;
+import com.example.nastya.homework4.database.PublicationDate;
 
 import java.io.Serializable;
 
@@ -6,10 +9,6 @@ import androidx.room.ColumnInfo;
 import androidx.room.Embedded;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
-
-interface News {
-    int getId();
-}
 
 @Entity
 public class ItemNews implements News, ListItem, Serializable {
@@ -38,23 +37,15 @@ public class ItemNews implements News, ListItem, Serializable {
         this.id = id;
     }
 
-    String getText() {
+    public String getText() {
         return text;
     }
 
-    public void setText(String text) {
-        this.text = text;
-    }
-
-    PublicationDate getPublicationDate() {
+    public PublicationDate getPublicationDate() {
         return publicationDate;
     }
 
-    public void setPublicationDate(PublicationDate publicationDate) {
-        this.publicationDate = publicationDate;
-    }
-
-    String getDescriptionNews() {
+    public String getDescriptionNews() {
         return descriptionNews;
     }
 
@@ -79,47 +70,3 @@ public class ItemNews implements News, ListItem, Serializable {
 }
 
 
-class PublicationDate implements Serializable {
-    @ColumnInfo(name = "date")
-    private long milliseconds;
-
-    PublicationDate(long milliseconds) {
-        this.milliseconds = milliseconds;
-    }
-
-    long getMilliseconds() {
-        return milliseconds;
-    }
-
-    public void setMilliseconds(long milliseconds) {
-        this.milliseconds = milliseconds;
-    }
-
-}
-
-@Entity
-class FavouritesNews implements News {
-
-    @PrimaryKey
-    private int id;
-
-    FavouritesNews(int id) {
-        this.id = id;
-    }
-
-    public int getId() {
-
-        return id;
-    }
-
-    @Override
-    public int hashCode() {
-        return this.id;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return this.id == ((News) obj).getId();
-    }
-
-}

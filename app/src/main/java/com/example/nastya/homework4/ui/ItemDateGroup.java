@@ -1,4 +1,4 @@
-package com.example.nastya.homework4;
+package com.example.nastya.homework4.ui;
 
 public class ItemDateGroup implements ListItem {
     private String date;

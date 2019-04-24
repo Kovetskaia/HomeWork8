@@ -9,6 +9,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        buildConfigField "String", "SERVER", '"https://api.tinkoff.ru/v1/"'
     }
     buildTypes {
         release {
@@ -34,6 +35,7 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxjava:2.1.13'
     implementation "com.squareup.retrofit2:retrofit:2.5.0"
     implementation "com.squareup.retrofit2:converter-gson:2.5.0"
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.4.0'
     implementation 'com.facebook.stetho:stetho-okhttp:1.5.1'
     annotationProcessor "androidx.room:room-compiler:2.1.0-alpha04"
     testImplementation 'junit:junit:4.12'

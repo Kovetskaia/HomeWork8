@@ -1,4 +1,4 @@
-package com.example.nastya.homework4;
+package com.example.nastya.homework4.ui;
 
 import android.app.AlertDialog;
 import android.net.ConnectivityManager;
@@ -7,6 +7,15 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.example.nastya.homework4.R;
+import com.example.nastya.homework4.database.App;
+import com.example.nastya.homework4.database.ItemNewsDao;
+import com.example.nastya.homework4.database.NewsDatabase;
+import com.example.nastya.homework4.network.Client;
+import com.example.nastya.homework4.network.NewsService;
+import com.example.nastya.homework4.network.ServerNewsItemDetails;
+import com.example.nastya.homework4.network.ServerResponse;
 
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
@@ -22,10 +31,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 import static android.content.Context.CONNECTIVITY_SERVICE;
 
@@ -35,10 +42,10 @@ public class NewsListFragment extends Fragment {
     private Long oldDate;
     private LocalDate curDay;
     private LocalDate yesDay;
-    private NewsDao newsDao;
+    private ItemNewsDao itemNewsDao;
     private MyAdapter myAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
-    private MyDataApi api;
+    private NewsService api;
     private DateTimeFormatter dateFormat = DateTimeFormat.forPattern("yyyy-MM-dd");
 
     @Override
@@ -49,7 +56,7 @@ public class NewsListFragment extends Fragment {
         yesDay = curDay.minusDays(1);
 
         NewsDatabase db = App.getInstance().getDatabase();
-        newsDao = db.newsDao();
+        itemNewsDao = db.newsDao();
         api = Client.getClientInstance().getMyDataApi();
         initData();
 
@@ -118,63 +125,54 @@ public class NewsListFragment extends Fragment {
     }
 
     private void getDataFromServer() {
-        Call<AllNews> myData = api.myData();
+        mDisposable.add(api.getNewsList()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new DisposableSingleObserver<ServerResponse<List<ItemNews>>>() {
+                    @Override
+                    public void onSuccess(ServerResponse<List<ItemNews>> listServerResponse) {
+                        List<ItemNews> newsFromNetwork = listServerResponse.getPayload().subList(0, 100);
 
-        myData.enqueue(new Callback<AllNews>() {
-            @Override
-            public void onResponse(Call<AllNews> call, Response<AllNews> response) {
-                if (response.isSuccessful()) {
-                    List<ItemNews> newsFromNetwork = response.body().getPayload().subList(0, 100);
-
-                    if (newsFromNetwork.size() != 0) {
-                        if (needUpdate(newsFromNetwork)) {
-                            groupByDate(newsFromNetwork);
-                            oldDate = ((ItemNews) itemsList.get(itemsList.size() - 1)).getPublicationDate().getMilliseconds();
-                            updateAdapter();
-                            insertNewsToDB(newsFromNetwork);
-                        } else {
-                            swipeRefreshSetFalse();
+                        if (newsFromNetwork.size() != 0) {
+                            if (needUpdate(newsFromNetwork)) {
+                                groupByDate(newsFromNetwork);
+                                oldDate = ((ItemNews) itemsList.get(itemsList.size() - 1)).getPublicationDate().getMilliseconds();
+                                updateAdapter();
+                                insertNewsToDB(newsFromNetwork);
+                            } else {
+                                swipeRefreshSetFalse();
+                            }
                         }
                     }
-                } else {
-                    onCreateDialog(getString(R.string.titleConnectionError), getString(R.string.messageConnectionError));
-                }
-            }
 
-            @Override
-            public void onFailure(Call<AllNews> call, Throwable t) {
-                onCreateDialog(getString(R.string.titleRequestFailed), getString(R.string.messageRequestFailed));
-            }
-        });
-
+                    @Override
+                    public void onError(Throwable e) {
+                        onCreateDialog(getString(R.string.titleRequestFailed), getString(R.string.messageRequestFailed));
+                    }
+                }));
     }
 
     private void getContentFromServer(ItemNews itemNews) {
-        Call<Content> getDescription = api.getDescription(itemNews.getId());
-
-        getDescription.enqueue(new Callback<Content>() {
-            @Override
-            public void onResponse(Call<Content> call, Response<Content> response) {
-                if (response.isSuccessful()) {
-                    String description = response.body().getPayload().getContent();
+        mDisposable.add(api.getDescription(itemNews.getId())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new DisposableSingleObserver<ServerResponse<ServerNewsItemDetails>>() {
+                    @Override
+                    public void onSuccess(ServerResponse<ServerNewsItemDetails> serverNewsItemDetailsServerResponse) {
+                        String description = serverNewsItemDetailsServerResponse.getPayload().getContent();
                     itemNews.setDescriptionNews(description);
                     startNewsContentActivity(itemNews);
                     insertContentToDB(itemNews);
-                } else {
-                    onCreateDialog(getString(R.string.titleConnectionError), getString(R.string.messageConnectionError));
-                }
-            }
+                    }
 
-            @Override
-            public void onFailure(Call<Content> call, Throwable t) {
-                onCreateDialog(getString(R.string.titleRequestFailed), getString(R.string.messageRequestFailed));
-            }
-        });
+                    @Override
+                    public void onError(Throwable e) {
+                        onCreateDialog(getString(R.string.titleRequestFailed), getString(R.string.messageRequestFailed));
+                    }
+                }));
 
     }
 
     private void getDataFromDB() {
-        mDisposable.add(newsDao.getAll()
+        mDisposable.add(itemNewsDao.getAll()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(listItems -> {
@@ -188,7 +186,7 @@ public class NewsListFragment extends Fragment {
     }
 
     private void getContent(int id) {
-        mDisposable.add(newsDao.getById(id)
+        mDisposable.add(itemNewsDao.getById(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(itemNews -> {
@@ -206,7 +204,7 @@ public class NewsListFragment extends Fragment {
     }
 
     private void insertNewsToDB(List<ItemNews> news) {
-        mDisposable.add(newsDao.insert(news)
+        mDisposable.add(itemNewsDao.insert(news)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::deleteOldNewsFromDB, error -> {
@@ -216,14 +214,14 @@ public class NewsListFragment extends Fragment {
     }
 
     private void insertContentToDB(ItemNews news) {
-        mDisposable.add(newsDao.insertContent(news.getDescriptionNews(), news.getId())
+        mDisposable.add(itemNewsDao.insertContent(news.getDescriptionNews(), news.getId())
                 .subscribeOn(Schedulers.io())
                 .subscribe());
 
     }
 
     private void deleteOldNewsFromDB() {
-        mDisposable.add(newsDao.delete(oldDate)
+        mDisposable.add(itemNewsDao.delete(oldDate)
                 .subscribeOn(Schedulers.io())
                 .subscribe());
 
