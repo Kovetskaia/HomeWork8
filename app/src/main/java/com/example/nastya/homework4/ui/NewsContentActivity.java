@@ -2,25 +2,32 @@ package com.example.nastya.homework4.ui;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.text.Html;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.nastya.homework4.R;
 import com.example.nastya.homework4.database.App;
 import com.example.nastya.homework4.database.FavouritesNewsDao;
+import com.example.nastya.homework4.database.ItemNewsDao;
 import com.example.nastya.homework4.database.NewsDatabase;
+import com.example.nastya.homework4.network.Client;
+import com.example.nastya.homework4.network.NewsService;
 
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-import androidx.appcompat.app.AppCompatActivity;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 
 public class NewsContentActivity extends AppCompatActivity {
@@ -28,30 +35,38 @@ public class NewsContentActivity extends AppCompatActivity {
     private FavouritesNews currentNews;
     private int id;
     private Boolean starVisible = false;
+    private static final String TAG = NewsContentActivity.class.getSimpleName();
+    private ItemNewsDao itemNewsDao;
+    private NewsService api;
     private final CompositeDisposable mDisposable = new CompositeDisposable();
+    private TextView contentDescription;
+    private ConnectivityManager connectivityManager;
     private DateTimeFormatter dateFormat = DateTimeFormat.forPattern("yyyy-MMMM-dd");
 
-    public static Intent createIntent(Context context, ItemNews news) {
+    public static Intent createIntent(Context context, ItemNews itemNews) {
         return new Intent(context, NewsContentActivity.class)
-                .putExtra(ItemNews.class.getSimpleName(), news);
+                .putExtra(ItemNews.class.getSimpleName(), itemNews);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.news_content);
-
         TextView contentDate = findViewById(R.id.contentDate);
-        TextView contentDescription = findViewById(R.id.contentDescription);
+        contentDescription = findViewById(R.id.contentDescription);
 
-        ItemNews itemNews = (ItemNews) getIntent().getSerializableExtra(ItemNews.class.getSimpleName());
-        id = itemNews.getId();
+        NewsDatabase db = App.getInstance().getDatabase();
+        itemNewsDao = db.newsDao();
+        api = Client.getClientInstance().getMyDataApi();
 
-        CharSequence styledString = Html.fromHtml(itemNews.getDescriptionNews());
-        contentDescription.setText(styledString);
+        ItemNews news = (ItemNews) getIntent().getSerializableExtra(ItemNews.class.getSimpleName());
+        id = news.getId();
 
-        contentDate.setText(dateFormat.print(itemNews.getPublicationDate().getMilliseconds()));
-        setTitle(itemNews.getText());
+        getContent(news);
+
+        contentDate.setText(dateFormat.print(news.getPublicationDate().getMilliseconds()));
+        setTitle(news.getText());
 
     }
 
@@ -64,18 +79,10 @@ public class NewsContentActivity extends AppCompatActivity {
         mDisposable.add(favouritesNewsDao.getById(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new DisposableSingleObserver<FavouritesNews>() {
-                    @Override
-                    public void onSuccess(FavouritesNews favouritesNews) {
-                        starVisible = true;
-                        currentNews = favouritesNews;
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        starVisible = false;
-                    }
-                }));
+                .subscribe(favouritesNews -> {
+                    starVisible = true;
+                    currentNews = favouritesNews;
+                }, throwable -> starVisible = false));
     }
 
     @Override
@@ -119,6 +126,75 @@ public class NewsContentActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(menuItem);
+    }
+
+    private void getContent(ItemNews news) {
+        mDisposable.add(itemNewsDao.getById(news.getId())
+                .doOnComplete(() -> {
+                    itemNewsDao.insertOneNews(news);
+                })
+                .defaultIfEmpty(news)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(itemNews -> {
+                    if (itemNews.getDescriptionNews() != null) {
+                        setContentInTextView(itemNews.getDescriptionNews());
+                    } else {
+                        if (checkConnection()) {
+                            getContentFromServer(itemNews.getId());
+                        } else {
+                            onCreateDialog(getString(R.string.titleConnectionError), getString(R.string.messageConnectionError));
+
+                        }
+                    }
+                }, throwable -> Log.e(TAG, "Unable to get data", throwable)));
+    }
+
+    private void getContentFromServer(int id) {
+        mDisposable.add(api.getDescription(id)
+                .map(serverNewsItemDetailsServerResponse -> serverNewsItemDetailsServerResponse.getPayload().getContent())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(s -> {
+                    setContentInTextView(s);
+                    insertContentToDB(s, id);
+                }, throwable -> onCreateDialog(getString(R.string.titleRequestFailed), getString(R.string.messageRequestFailed))));
+    }
+
+    private void insertContentToDB(String content, int id) {
+        mDisposable.add(itemNewsDao.insertContent(content, id)
+                .subscribeOn(Schedulers.io())
+                .subscribe());
+    }
+
+    private void setContentInTextView(String content) {
+        CharSequence styledString = Html.fromHtml(content);
+        contentDescription.setText(styledString);
+    }
+
+    private void initConnectivityManager() {
+        if (connectivityManager == null) {
+            connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        }
+    }
+
+    private boolean checkConnection() {
+        initConnectivityManager();
+        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+    }
+
+    private void onCreateDialog(String title, String message) {
+        AlertDialog.Builder dialogWindow = new AlertDialog.Builder(this);
+        dialogWindow.setTitle(title);
+        dialogWindow.setMessage(message);
+        dialogWindow.setIcon(android.R.drawable.ic_dialog_info);
+        dialogWindow.setPositiveButton(R.string.ok,
+                (dialog, which) -> {
+                    dialog.cancel();
+                    finish();
+                });
+        dialogWindow.setCancelable(false);
+        dialogWindow.show();
     }
 
     @Override

@@ -5,6 +5,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.nastya.homework4.R;
 import com.example.nastya.homework4.database.App;
 import com.example.nastya.homework4.database.FavouritesNewsDao;
@@ -14,10 +19,6 @@ import com.example.nastya.homework4.database.NewsDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableSingleObserver;
@@ -66,7 +67,9 @@ public class NewsFavouritesFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment, container, false);
+        View rootView = inflater.inflate(R.layout.fragment, container, false);
+        rootView.findViewById(R.id.swipeRefreshLayout).setEnabled(false);
+        return rootView;
 
     }
 

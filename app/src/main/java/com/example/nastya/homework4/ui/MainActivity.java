@@ -2,10 +2,6 @@ package com.example.nastya.homework4.ui;
 
 import android.os.Bundle;
 
-import com.example.nastya.homework4.R;
-import com.facebook.stetho.Stetho;
-import com.google.android.material.tabs.TabLayout;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -13,19 +9,21 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import com.example.nastya.homework4.R;
+import com.facebook.stetho.Stetho;
+import com.google.android.material.tabs.TabLayout;
+
 public class MainActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener {
     static final int COUNT_PAGES = 2;
-    PagerAdapter pagerAdapter;
-    ViewPager viewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Stetho.initializeWithDefaults(this);
-        pagerAdapter = new MyFragmentPagerAdapter(getSupportFragmentManager());
+        PagerAdapter pagerAdapter = new MyFragmentPagerAdapter(getSupportFragmentManager());
 
-        viewPager = findViewById(R.id.pager);
+        ViewPager viewPager = findViewById(R.id.pager);
         viewPager.setAdapter(pagerAdapter);
 
         TabLayout tabLayout = findViewById(R.id.tabs);
